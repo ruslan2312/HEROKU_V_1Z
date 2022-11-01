@@ -43,7 +43,14 @@ export const authRegistrationConfirm = body('code').isString().trim().isLength({
     max: 150
 }).custom(async code => {
     const user = await usersRepository.findUserByCode(code)
-    if(user === null) throw new Error
+    if (user === null) throw new Error
+    if (user?.emailConfirmation.confirmationCode !== code) throw new Error
+    if (user?.emailConfirmation.isConfirmed === true) throw new Error
+    return true
+})
+export const authLogoutValidation = body('logout').custom(async code => {
+    const user = await usersRepository.findUserByCode(code)
+    if (user === null) throw new Error
     if (user?.emailConfirmation.confirmationCode !== code) throw new Error
     if (user?.emailConfirmation.isConfirmed === true) throw new Error
     return true

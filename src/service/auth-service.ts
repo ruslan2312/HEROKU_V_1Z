@@ -24,9 +24,9 @@ export const authService = {
         const userId = await jwtService.getUserIdByRefreshToken(refreshTokens)
         const user = await usersService.findUserById(userId)
         if (user) {
-            await usersRepository.addRefreshTokenByBlackList(refreshTokens)
-            const blackList = await usersRepository.findRefreshTokenInBlackListByRT(refreshTokens)
-            return !blackList;
+            const r = await usersRepository.findRefreshTokenInBlackListByRT(refreshTokens);
+            if(r) return false
+            else  return  await usersRepository.addRefreshTokenByBlackList(refreshTokens)
         } else return false;
     }
 }
