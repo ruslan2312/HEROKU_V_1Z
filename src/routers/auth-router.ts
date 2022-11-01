@@ -67,6 +67,7 @@ authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationM
     if (blackList) res.sendStatus(401)
     else {
         if (userId) {
+            await usersRepository.addRefreshTokenByBlackList(refreshToken)
             const token = await jwtService.createJWT(user)
             res.cookie("refreshToken", token.refreshToken, {
                     httpOnly: true,
