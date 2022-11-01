@@ -96,6 +96,6 @@ export const usersRepository = {
         const result = await RefreshTokenCollection.findOne({refreshToken: refreshTokens})
         if (result) {
             return true
-        } else return true
+        } else return false
     }
 }
