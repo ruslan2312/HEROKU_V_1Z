@@ -9,22 +9,4 @@ export const jwtService = {
         return {accessToken, refreshToken}
     },
 
-    async getUserIdByAccessToken(token: string) {
-        try {
-            const result: any = jwt.verify(token, settings.JWT_SECRET)
-            return result.id
-        } catch (error) {
-            return null
-        }
-    },
-
-    async getUserIdByRefreshToken(token: string) {
-        try {
-            debugger
-            const result: any = jwt.verify(token, settings.JWT_REFRESH_SECRET)
-            return result.id
-        } catch (error) {
-            return null
-        }
-    },
 }

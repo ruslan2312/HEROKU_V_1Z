@@ -1,10 +1,8 @@
 import {emailAdapter} from "../adapter/email-adapter";
 import {usersRepository} from "../repository/users-repository";
 import {randomUUID} from "crypto";
-import {jwtService} from "../application/jwt-service";
-import jwt from "jsonwebtoken";
-import {settings} from "../settings";
 import {usersService} from "./users-service";
+import {authRepository} from "../repository/auth-repository";
 
 export const authService = {
     async resentEmail(email: string): Promise<boolean | null> {
@@ -21,12 +19,18 @@ export const authService = {
         } else return null
     },
     async logout(refreshTokens: string): Promise<boolean> {
-        const userId = await jwtService.getUserIdByRefreshToken(refreshTokens)
+        const userId = await usersService.getUserIdByRefreshToken(refreshTokens)
         const user = await usersService.findUserById(userId)
         if (user) {
-            const r = await usersRepository.findRefreshTokenInBlackListByRT(refreshTokens);
-            if(r) return false
-            else  return  await usersRepository.addRefreshTokenByBlackList(refreshTokens)
+            const r = await authRepository.findRefreshTokenInBlackListByRT(refreshTokens);
+            if (r) return false
+            else return await authRepository.addRefreshTokenByBlackList(refreshTokens)
         } else return false;
-    }
+    },
+    async findRefreshTokenInBlackListByRT(refreshTokens: string): Promise<boolean> {
+        return await authRepository.findRefreshTokenInBlackListByRT(refreshTokens)
+    },
+    async addRefreshTokenByBlackList(refreshTokens: string): Promise<boolean> {
+        return await authRepository.addRefreshTokenByBlackList(refreshTokens)
+    },
 }

@@ -12,8 +12,6 @@ import {inputValidationMiddleware} from "../middleware/Input-validation-middlewa
 import {authTokenMW} from "../middleware/authorization-middleware";
 import {authService} from "../service/auth-service";
 import {refreshTokenUpdateMiddleware} from "../middleware/refreshTokenUpdate-middleware";
-import any = jasmine.any;
-import {usersRepository} from "../repository/users-repository";
 
 export const authRouter = Router()
 authRouter.post('/login', authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
@@ -62,12 +60,12 @@ authRouter.post('/registration-confirmation', authRegistrationConfirm, inputVali
 authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user
     const refreshToken = req.cookies.refreshToken
-    const userId =  await jwtService.getUserIdByRefreshToken(refreshToken)
-    const blackList = await usersRepository.findRefreshTokenInBlackListByRT(refreshToken)
+    const userId =  await usersService.getUserIdByRefreshToken(refreshToken)
+    const blackList = await authService.findRefreshTokenInBlackListByRT(refreshToken)
     if (blackList) res.sendStatus(401)
     else {
         if (userId) {
-            await usersRepository.addRefreshTokenByBlackList(refreshToken)
+            await authService.addRefreshTokenByBlackList(refreshToken)
             const token = await jwtService.createJWT(user)
             res.cookie("refreshToken", token.refreshToken, {
                     httpOnly: true,

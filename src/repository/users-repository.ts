@@ -1,7 +1,8 @@
-import {RefreshTokenCollection, UsersCollection} from "./db";
+import { UsersCollection} from "./db";
 import {UserDbType, UserResponseType, UsersPaginationQueryType} from "../types/usersType";
 import {Filter} from "mongodb";
 import {paginationResult, PaginationResultType} from "../helpers/paginathion";
+
 
 export const usersRepository = {
     async findUsers(queryData: UsersPaginationQueryType): Promise<PaginationResultType> {
@@ -86,15 +87,5 @@ export const usersRepository = {
 
 
     //HYETA
-    async addRefreshTokenByBlackList(refreshTokens: string): Promise<boolean> {
-        debugger
-        const result = await RefreshTokenCollection.insertOne({refreshToken: refreshTokens})
-        return result.acknowledged
-    },
-    async findRefreshTokenInBlackListByRT(refreshTokens: string): Promise<boolean> {
-        const result = await RefreshTokenCollection.findOne({refreshToken: refreshTokens})
-        if (result) {
-            return true
-        } else return false
-    }
+
 }

@@ -1,6 +1,5 @@
 import {NextFunction, Request, Response} from "express";
 import {usersService} from "../service/users-service";
-import {jwtService} from "../application/jwt-service";
 
 export const authTokenMW = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
@@ -10,7 +9,7 @@ export const authTokenMW = async (req: Request, res: Response, next: NextFunctio
     const authType = req.headers.authorization.split(" ")[0]
     if (authType !== 'Bearer') return res.sendStatus(401)
     const token = req.headers.authorization.split(" ")[1]
-    const userId = await jwtService.getUserIdByAccessToken(token)
+    const userId = await usersService.getUserIdByAccessToken(token)
     const user = await usersService.findUserById(userId)
     if (user) {
         req.user = user
