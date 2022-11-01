@@ -1,6 +1,10 @@
 import {emailAdapter} from "../adapter/email-adapter";
 import {usersRepository} from "../repository/users-repository";
 import {randomUUID} from "crypto";
+import {jwtService} from "../application/jwt-service";
+import jwt from "jsonwebtoken";
+import {settings} from "../settings";
+import {usersService} from "./users-service";
 
 export const authService = {
     async resentEmail(email: string): Promise<boolean | null> {
@@ -15,5 +19,10 @@ export const authService = {
         if (updateIsConfirmed) {
             return true
         } else return null
+    },
+    async logout(refreshTokens: string) {
+        const userId = await jwtService.getUserIdByRefreshToken(refreshTokens)
+        const user = await usersService.findUserById(userId)
+        return !!user;
     }
 }

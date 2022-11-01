@@ -82,9 +82,10 @@ authRouter.get('/me', authTokenMW, async (req: Request, res: Response) => {
         res.sendStatus(401)
     }
 })
-authRouter.post('/logout', (req: Request, res: Response) => {
-    const {token} = req.body;
+authRouter.post('/logout', async (req: Request, res: Response) => {
     let refreshTokens = req.cookies.refreshToken
-    refreshTokens.filter((t: any) => t !== t);
-    res.send("Logout successful");
+    const logout = await authService.logout(refreshTokens)
+    if (logout) {
+        res.send(204)
+    } else res.sendStatus(401)
 });
