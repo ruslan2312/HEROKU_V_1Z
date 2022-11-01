@@ -88,9 +88,7 @@ export const usersRepository = {
     //HYETA
     async addRefreshTokenByBlackList(refreshTokens: string): Promise<boolean> {
         const result = await RefreshTokenCollection.insertOne({refreshToken: refreshTokens})
-        if (result) {
-            return true
-        } else return false
+        return result.acknowledged
     },
     async findRefreshTokenInBlackListByRT(refreshTokens: string): Promise<boolean> {
         const result = await RefreshTokenCollection.findOne({refreshToken: refreshTokens})

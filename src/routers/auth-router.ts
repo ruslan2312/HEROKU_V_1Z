@@ -89,7 +89,9 @@ authRouter.get('/me', authTokenMW, async (req: Request, res: Response) => {
 })
 authRouter.post('/logout', async (req: Request, res: Response) => {
     let refreshTokens = req.cookies.refreshToken
+    debugger
     const logout = await authService.logout(refreshTokens)
+    debugger
     if (logout) {
         res.send(204)
     } else res.sendStatus(401)
