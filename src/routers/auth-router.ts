@@ -12,6 +12,7 @@ import {inputValidationMiddleware} from "../middleware/Input-validation-middlewa
 import {authTokenMW} from "../middleware/authorization-middleware";
 import {authService} from "../service/auth-service";
 import {refreshTokenUpdateMiddleware} from "../middleware/refreshTokenUpdate-middleware";
+import any = jasmine.any;
 
 export const authRouter = Router()
 authRouter.post('/login', authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
@@ -81,3 +82,9 @@ authRouter.get('/me', authTokenMW, async (req: Request, res: Response) => {
         res.sendStatus(401)
     }
 })
+authRouter.post('/logout', (req: Request, res: Response) => {
+    const {token} = req.body;
+    let refreshTokens = req.cookies.refreshToken
+    refreshTokens.filter((t: any) => t !== t);
+    res.send("Logout successful");
+});
