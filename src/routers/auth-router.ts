@@ -62,16 +62,18 @@ authRouter.post('/registration-confirmation', authRegistrationConfirm, inputVali
 authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user
     const blackList = await usersRepository.findRefreshTokenInBlackListByRT(req.cookies.refreshToken)
-    if(blackList) return 401
-    if (user) {
-        const token = await jwtService.createJWT(user)
-        res.cookie("refreshToken", token.refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production"
-            },
-        ).send({accessToken: token.accessToken})
-    } else {
-        res.sendStatus(401)
+    if (blackList) res.sendStatus(401)
+    else {
+        if (user) {
+            const token = await jwtService.createJWT(user)
+            res.cookie("refreshToken", token.refreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production"
+                },
+            ).send({accessToken: token.accessToken})
+        } else {
+            res.sendStatus(401)
+        }
     }
 })
 
