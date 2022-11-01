@@ -61,7 +61,8 @@ authRouter.post('/registration-confirmation', authRegistrationConfirm, inputVali
 
 authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user
-    const blackList = await usersRepository.findRefreshTokenInBlackListByRT(req.cookies.refreshToken)
+    const refreshToken = req.cookies.refreshToken
+    const blackList = await usersRepository.findRefreshTokenInBlackListByRT(refreshToken)
     if (blackList) res.sendStatus(401)
     else {
         if (user) {
@@ -70,7 +71,7 @@ authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationM
                     httpOnly: true,
                     secure: process.env.NODE_ENV === "production"
                 },
-            ).send({accessToken: token.accessToken})
+            ).send({accessToken: token.accessToken}).status(200)
         } else {
             res.sendStatus(401)
         }
@@ -89,9 +90,7 @@ authRouter.get('/me', authTokenMW, async (req: Request, res: Response) => {
 })
 authRouter.post('/logout', async (req: Request, res: Response) => {
     let refreshTokens = req.cookies.refreshToken
-    debugger
     const logout = await authService.logout(refreshTokens)
-    debugger
     if (logout) {
         res.send(204)
     } else res.sendStatus(401)
