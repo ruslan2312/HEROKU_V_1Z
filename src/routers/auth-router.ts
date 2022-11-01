@@ -13,6 +13,7 @@ import {authTokenMW} from "../middleware/authorization-middleware";
 import {authService} from "../service/auth-service";
 import {refreshTokenUpdateMiddleware} from "../middleware/refreshTokenUpdate-middleware";
 import any = jasmine.any;
+import {usersRepository} from "../repository/users-repository";
 
 export const authRouter = Router()
 authRouter.post('/login', authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
@@ -60,6 +61,8 @@ authRouter.post('/registration-confirmation', authRegistrationConfirm, inputVali
 
 authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user
+    const blackList = await usersRepository.findRefreshTokenInBlackListByRT(req.cookies.refreshToken)
+    if(blackList) return 401
     if (user) {
         const token = await jwtService.createJWT(user)
         res.cookie("refreshToken", token.refreshToken, {

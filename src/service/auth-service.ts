@@ -20,9 +20,12 @@ export const authService = {
             return true
         } else return null
     },
-    async logout(refreshTokens: string) {
+    async logout(refreshTokens: string): Promise<boolean> {
         const userId = await jwtService.getUserIdByRefreshToken(refreshTokens)
         const user = await usersService.findUserById(userId)
-        return !!user;
+        if (user) {
+            await usersRepository.addRefreshTokenByBlackList(refreshTokens)
+            return true
+        } else return false;
     }
 }

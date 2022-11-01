@@ -1,0 +1,3 @@
+type refreshTokenType = {
+    refreshToken: string
+}
