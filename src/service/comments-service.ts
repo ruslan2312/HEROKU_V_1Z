@@ -20,7 +20,6 @@ export const commentsService = {
         return commentsRepository.deleteAllComments()
     },
     async findCommentsByPostId(queryData: CommentsPaginationQueryType, postId: string): Promise<PaginationResultType | null> {
-        debugger
         const post = await postsRepository.findPostByID(postId)
         if (post) {
             return await commentsRepository.findCommentsByPostId(queryData, postId)

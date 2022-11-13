@@ -8,18 +8,25 @@ import {allDelete} from "./routers/all-delete";
 import {usersRouter} from "./routers/users-router";
 import {authRouter} from "./routers/auth-router";
 import {commentsRouter} from "./routers/comments-router";
-import {emailRouter} from "./routers/email.route";
+import {emailRouter} from "./routers/email-route";
+import {devicesRouter} from "./routers/devices-router";
+
 
 dotenv.config()
 
 export const app = express();
+
 const port = process.env.PORT || 3000
+app.enable('trust proxy')
+
 app.use(cookieParser())
 app.use(express.json())
+
 app.use('/blogs', blogsRouter)
 app.use('/posts', postsRouter)
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
+app.use('/security', devicesRouter)
 app.use("/comments", commentsRouter)
 app.use('/email', emailRouter)
 app.use('/testing/all-data', allDelete)

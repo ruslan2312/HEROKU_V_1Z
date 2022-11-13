@@ -3,6 +3,7 @@ import {usersRepository} from "../repository/users-repository";
 import {randomUUID} from "crypto";
 import {usersService} from "./users-service";
 import {authRepository} from "../repository/auth-repository";
+import {deviceService} from "./device-service";
 
 export const authService = {
     async resentEmail(email: string): Promise<boolean | null> {
@@ -18,13 +19,16 @@ export const authService = {
             return true
         } else return null
     },
-    async logout(refreshTokens: string): Promise<boolean> {
+    async logout(refreshTokens: string, userAgent: string): Promise<boolean> {
         const userId = await usersService.getUserIdByRefreshToken(refreshTokens)
         const user = await usersService.findUserById(userId)
         if (user) {
             const r = await authRepository.findRefreshTokenInBlackListByRT(refreshTokens);
             if (r) return false
-            else return await authRepository.addRefreshTokenByBlackList(refreshTokens)
+            else {
+               await deviceService.deleteDeviceByIdAndUserId(userAgent, user.id,)
+                return await authRepository.addRefreshTokenByBlackList(refreshTokens)
+            }
         } else return false;
     },
     async findRefreshTokenInBlackListByRT(refreshTokens: string): Promise<boolean> {

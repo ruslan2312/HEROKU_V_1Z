@@ -1,4 +1,4 @@
-export type BlogsResponseType = {
+export type BlogsType = {
     id: string,
     name: string,
     youtubeUrl: string,

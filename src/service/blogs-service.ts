@@ -1,20 +1,20 @@
 import {blogsRepository} from "../repository/blogs-repository";
 import {postsRepository} from "../repository/posts-repository";
 import {BlogsCollection} from "../repository/db";
-import { BlogsResponseType, BlogPaginationQueryType} from "../types/blogsType";
-import {PostsResponseType, FindPostByIdPaginationQueryType} from "../types/postsType"
+import { BlogsType, BlogPaginationQueryType} from "../types/blogsType";
+import {PostsType, FindPostByIdPaginationQueryType} from "../types/postsType"
 
 export const blogsService = {
-    async findBlog(query: BlogPaginationQueryType): Promise<BlogsResponseType[]> {
+    async findBlog(query: BlogPaginationQueryType): Promise<BlogsType[]> {
         return blogsRepository.findBlog(query)
     },
-    async findBlogByID(id: string): Promise<BlogsResponseType | null> {
+    async findBlogByID(id: string): Promise<BlogsType | null> {
         return blogsRepository.findBlogByID(id)
     },
-    async findBlogAndPostByID(query: FindPostByIdPaginationQueryType, blogId: string): Promise<PostsResponseType[] | any> {
+    async findBlogAndPostByID(query: FindPostByIdPaginationQueryType, blogId: string): Promise<PostsType[] | any> {
         return await blogsRepository.findBlogByPostId(query, blogId)
     },
-    async createBlog(name: string, youtubeUrl: string): Promise<BlogsResponseType> {
+    async createBlog(name: string, youtubeUrl: string): Promise<BlogsType> {
         const newBlog = {
             id: new Date().valueOf().toString(),
             name: name,
@@ -23,11 +23,10 @@ export const blogsService = {
         }
         return await blogsRepository.createBlog(newBlog)
     },
-    async createPostByBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostsResponseType | null> {
+    async createPostByBlog(blogId: string, title: string, shortDescription: string, content: string): Promise<PostsType | null> {
         const blogger = await BlogsCollection.findOne({id: blogId})
-        debugger
         if (blogger) {
-            const newPost: PostsResponseType = {
+            const newPost: PostsType = {
                 id: new Date().valueOf().toString(),
                 title: title,
                 shortDescription: shortDescription,

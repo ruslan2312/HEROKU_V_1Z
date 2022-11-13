@@ -65,11 +65,9 @@ export const usersService = {
         return usersRepository.deleteAllUsers()
     },
     async checkCredentials(loginOrEmail: string, password: string) {
-        debugger
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) return false
         const passwordHash = await this._generateHash(password, user.accountData.passwordSalt)
-        debugger
         if (user.accountData.passwordHash === passwordHash) {
             return user
         } else return null;

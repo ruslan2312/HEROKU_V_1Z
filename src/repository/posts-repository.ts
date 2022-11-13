@@ -1,11 +1,11 @@
 import {PostsCollection} from "./db";
 import {
     PostPaginationQueryType,
-    PostsResponseType
+    PostsType
 } from "../types/postsType";
 import {paginationResult, PaginationResultType} from "../helpers/paginathion";
 
-export const posts: PostsResponseType [] = [];
+export const posts: PostsType [] = [];
 
 export const postsRepository = {
     async findPost(queryData: PostPaginationQueryType): Promise<PaginationResultType> {
@@ -19,7 +19,7 @@ export const postsRepository = {
             .toArray()
         return paginationResult(page, pageSize, totalCount, items)
     },
-    async findPostByID(id: string): Promise<PostsResponseType | null> {
+    async findPostByID(id: string): Promise<PostsType | null> {
         return PostsCollection.findOne({id: id}, {projection: {_id: 0}})
     },
     async deletePost(id: string): Promise<boolean> {
@@ -37,7 +37,7 @@ export const postsRepository = {
         })
         return result.matchedCount === 1
     },
-    async createPost(newPost: PostsResponseType): Promise<PostsResponseType> {
+    async createPost(newPost: PostsType): Promise<PostsType> {
         await PostsCollection.insertOne({...newPost});
         return newPost
     },

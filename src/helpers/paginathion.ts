@@ -1,9 +1,9 @@
 import { UserResponseType} from "../types/usersType";
-import {PostsResponseType} from "../types/postsType"
-import {BlogsResponseType} from "../types/blogsType"
+import {PostsType} from "../types/postsType"
+import {BlogsType} from "../types/blogsType"
 import {CommentsResponseType} from "../types/commentsType"
 
-type PaginationItemsType = UserResponseType[] | BlogsResponseType[] | CommentsResponseType[] | PostsResponseType[]
+type PaginationItemsType = UserResponseType[] | BlogsType[] | CommentsResponseType[] | PostsType[]
 
 export type PaginationResultType = {
     pagesCount: number,

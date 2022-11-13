@@ -3,7 +3,6 @@ import {CommentsCollection} from "./db";
 import {Filter} from "mongodb";
 import {PaginationResultType} from "../helpers/paginathion";
 
-
 export const comments: CommentsType[] = []
 
 export const commentsRepository = {
@@ -12,13 +11,11 @@ export const commentsRepository = {
     },
     async updateComments(commentId: string, content: string, userId: string): Promise<boolean | null> {
         try {
-            debugger
             const result = await CommentsCollection.updateOne({id: commentId, userId}, {$set: {content}})
             return result.modifiedCount === 1
         } catch (e) {
             return null
         }
-
     },
     async deleteComment(id: string): Promise<boolean | null> {
         try {

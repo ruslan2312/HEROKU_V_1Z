@@ -1,9 +1,9 @@
 import {BlogsCollection, PostsCollection} from "./db";
-import {PostsResponseType, FindPostByIdPaginationQueryType} from "../types/postsType";
-import {BlogsResponseType, BlogPaginationQueryType} from "../types/blogsType";
+import {PostsType, FindPostByIdPaginationQueryType} from "../types/postsType";
+import {BlogsType, BlogPaginationQueryType} from "../types/blogsType";
 import {PaginationResultType} from "../helpers/paginathion";
 
-export const blogs: BlogsResponseType [] = [];
+export const blogs: BlogsType [] = [];
 
 export const blogsRepository = {
     async findBlog(queryData: BlogPaginationQueryType): Promise<any> {
@@ -27,7 +27,7 @@ export const blogsRepository = {
             .toArray()
         return Promise.resolve({pagesCount, page, pageSize, totalCount, items,})
     },
-    async findBlogByID(id: string): Promise<BlogsResponseType | null> {
+    async findBlogByID(id: string): Promise<BlogsType | null> {
         return await BlogsCollection.findOne({id: id}, {projection: {_id: 0}});
     },
     async findBlogByPostId(queryData: FindPostByIdPaginationQueryType, blogId: string): Promise<PaginationResultType | null> {
@@ -49,17 +49,16 @@ export const blogsRepository = {
             .skip((page - 1) * pageSize)
             .limit(pageSize)
             .toArray()
-        debugger
         if (await PostsCollection.findOne({blogId: blogId}) === null) {
             return null
         }
         return Promise.resolve({pagesCount, page, pageSize, totalCount, items})
     },
-    async createBlog(newBlog: BlogsResponseType): Promise<BlogsResponseType> {
+    async createBlog(newBlog: BlogsType): Promise<BlogsType> {
         await BlogsCollection.insertOne({...newBlog});
         return newBlog
     },
-    async createPostByBlog(newPost: PostsResponseType): Promise<PostsResponseType> {
+    async createPostByBlog(newPost: PostsType): Promise<PostsType> {
         await PostsCollection.insertOne({...newPost});
         return newPost
     },

@@ -1,3 +1,3 @@
-type refreshTokenType = {
+type RefreshTokenType = {
     refreshToken: string
 }

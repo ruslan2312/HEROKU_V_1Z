@@ -12,12 +12,17 @@ import {inputValidationMiddleware} from "../middleware/Input-validation-middlewa
 import {authTokenMW} from "../middleware/authorization-middleware";
 import {authService} from "../service/auth-service";
 import {refreshTokenUpdateMiddleware} from "../middleware/refreshTokenUpdate-middleware";
+import {deviceService} from "../service/device-service";
 
 export const authRouter = Router()
+
 authRouter.post('/login', authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = await usersService.checkCredentials(req.body.login, req.body.password)
     if (user) {
-        const token = await jwtService.createJWT(user)
+        const ip = req.ip
+        const userAgent = req.headers["user-agent"]
+        await deviceService.addDevice(user.id, userAgent!, ip)
+        const token = await jwtService.createJWT(user, userAgent!)
         res.cookie("refreshToken", token.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production"
@@ -43,7 +48,6 @@ authRouter.post('/registration', usersLoginValidation, usersPasswordValidation, 
 authRouter.post('/registration-email-resending', usersEmailValidationResending, inputValidationMiddleware, async (req: Request, res: Response) => {
     const email = req.body.email
     const resendingEmail = await authService.resentEmail(email)
-    debugger
     if (resendingEmail) {
         res.sendStatus(204)
     } else return res.sendStatus(400)
@@ -58,24 +62,25 @@ authRouter.post('/registration-confirmation', authRegistrationConfirm, inputVali
 })
 
 authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const user = req.user
+    const user = req.user!
     const refreshToken = req.cookies.refreshToken
-    const userId =  await usersService.getUserIdByRefreshToken(refreshToken)
     const blackList = await authService.findRefreshTokenInBlackListByRT(refreshToken)
-    if (blackList) res.sendStatus(401)
-    else {
-        if (userId) {
-            await authService.addRefreshTokenByBlackList(refreshToken)
-            const token = await jwtService.createJWT(user)
-            res.cookie("refreshToken", token.refreshToken, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === "production"
-                },
-            ).send({accessToken: token.accessToken}).status(200)
-        } else {
-            res.sendStatus(401)
-        }
+    if (blackList) {
+        return res.sendStatus(401)
     }
+    if (user) {
+        await authService.addRefreshTokenByBlackList(refreshToken)
+        const userAgent = req.headers["user-agent"]
+        const token = await jwtService.createJWT(user, userAgent!)
+        res.cookie("refreshToken", token.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production"
+            },
+        ).send({accessToken: token.accessToken}).status(200)
+    } else {
+        res.sendStatus(401)
+    }
+
 })
 
 authRouter.get('/me', authTokenMW, async (req: Request, res: Response) => {
@@ -90,9 +95,10 @@ authRouter.get('/me', authTokenMW, async (req: Request, res: Response) => {
 })
 
 authRouter.post('/logout', async (req: Request, res: Response) => {
-    let refreshTokens = req.cookies.refreshToken
-    const logout = await authService.logout(refreshTokens)
+    const refreshTokens = req.cookies.refreshToken
+    const userAgent = req.headers["user-agent"]
+    const logout = await authService.logout(refreshTokens, userAgent!)
     if (logout) {
-        res.send(204)
+        res.sendStatus(204)
     } else res.sendStatus(401)
 });
