@@ -80,10 +80,10 @@ export const usersService = {
             return null
         }
     },
-    async getUserIdByRefreshToken(token: string) {
+    async getTokenPayload(token: string) {
         try {
             const result: any = jwt.verify(token, settings.JWT_REFRESH_SECRET)
-            return result.id
+            return result
         } catch (error) {
             return null
         }

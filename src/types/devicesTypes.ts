@@ -3,8 +3,8 @@ export type  DeviceType = {
     ip: string,
     title: string,
     lastActiveDate: string,
+    exp: string
     deviceId: string,
-    statusToken: boolean
 }
 export type DeviceResponseType = {
     ip: string,

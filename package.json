@@ -5,8 +5,10 @@
   "license": "MIT",
   "dependencies": {
     "@types/cookie-parser": "^1.4.3",
+    "@types/cors": "^2.8.12",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "date-fns": "^2.29.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
@@ -17,7 +19,7 @@
     "nodemailer": "^6.8.0"
   },
   "scripts": {
-    "watch": "tsc -w",
+    "watch": "NODE_ENV=123& tsc -w",
     "dev": "nodemon --inspect dist/index.js",
     "test": "jest",
     "build": "tsc",

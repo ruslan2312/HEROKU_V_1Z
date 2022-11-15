@@ -10,14 +10,14 @@ import {authRouter} from "./routers/auth-router";
 import {commentsRouter} from "./routers/comments-router";
 import {emailRouter} from "./routers/email-route";
 import {devicesRouter} from "./routers/devices-router";
-
+import cors from 'cors'
 
 dotenv.config()
 
 export const app = express();
-
+app.use(cors())
 const port = process.env.PORT || 3000
-app.enable('trust proxy')
+app.set('trust proxy', true)
 
 app.use(cookieParser())
 app.use(express.json())

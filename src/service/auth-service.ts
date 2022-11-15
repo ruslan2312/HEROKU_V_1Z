@@ -20,8 +20,8 @@ export const authService = {
         } else return null
     },
     async logout(refreshTokens: string, userAgent: string): Promise<boolean> {
-        const userId = await usersService.getUserIdByRefreshToken(refreshTokens)
-        const user = await usersService.findUserById(userId)
+        const payload = await usersService.getTokenPayload(refreshTokens)
+        const user = await usersService.findUserById(payload.id)
         if (user) {
             const r = await authRepository.findRefreshTokenInBlackListByRT(refreshTokens);
             if (r) return false

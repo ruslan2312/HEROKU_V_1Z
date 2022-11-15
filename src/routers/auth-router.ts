@@ -13,6 +13,12 @@ import {authTokenMW} from "../middleware/authorization-middleware";
 import {authService} from "../service/auth-service";
 import {refreshTokenUpdateMiddleware} from "../middleware/refreshTokenUpdate-middleware";
 import {deviceService} from "../service/device-service";
+import {randomUUID} from "crypto";
+import {settings} from "../settings";
+import {verify} from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import {deviceRepository} from "../repository/device-repository";
+import {log} from "util";
 
 export const authRouter = Router()
 
@@ -20,14 +26,16 @@ authRouter.post('/login', authLoginValidation, authPasswordValidation, inputVali
     const user = await usersService.checkCredentials(req.body.login, req.body.password)
     if (user) {
         const ip = req.ip
+        const deviceId = randomUUID()
         const userAgent = req.headers["user-agent"]
-        await deviceService.addDevice(user.id, userAgent!, ip)
-        const token = await jwtService.createJWT(user, userAgent!)
+        const token = await jwtService.createJWT(user, deviceId)
+        const time = await deviceService.getIatAndExpToken(token.refreshToken)
+        await deviceService.addDevice(user.id, userAgent!, ip, deviceId, time.iat, time.exp)
         res.cookie("refreshToken", token.refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production"
+                secure: false
             },
-        ).send({accessToken: token.accessToken})
+        ).status(200).send({accessToken: token.accessToken})
     } else {
         res.sendStatus(401)
     }
@@ -64,23 +72,22 @@ authRouter.post('/registration-confirmation', authRegistrationConfirm, inputVali
 authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user!
     const refreshToken = req.cookies.refreshToken
-    const blackList = await authService.findRefreshTokenInBlackListByRT(refreshToken)
-    if (blackList) {
-        return res.sendStatus(401)
-    }
-    if (user) {
-        await authService.addRefreshTokenByBlackList(refreshToken)
-        const userAgent = req.headers["user-agent"]
-        const token = await jwtService.createJWT(user, userAgent!)
+    const payload: any = await deviceService.getPayload(refreshToken)
+    const checkRefreshToken = await deviceService.checkRefreshToken(user.id, payload.iat, payload.exp, payload.deviceId)
+    debugger
+    if (checkRefreshToken) {
+        const token = await jwtService.createJWT(user, payload.deviceId!)
         res.cookie("refreshToken", token.refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production"
+                secure: false
             },
         ).send({accessToken: token.accessToken}).status(200)
+        const payload2: any = await deviceService.getPayload(token.refreshToken)
+        debugger
+        const updateRefreshToken = await deviceService.updateRefreshToken(user.id, payload2.iat, payload2.exp, payload2.deviceId, payload.iat)
     } else {
         res.sendStatus(401)
     }
-
 })
 
 authRouter.get('/me', authTokenMW, async (req: Request, res: Response) => {
