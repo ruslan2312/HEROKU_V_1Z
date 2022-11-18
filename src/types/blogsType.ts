@@ -1,7 +1,7 @@
 export type BlogsType = {
     id: string,
     name: string,
-    youtubeUrl: string,
+    websiteUrl: string,
     createdAt: string;
 }
 export type BlogPaginationQueryType = {

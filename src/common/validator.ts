@@ -9,7 +9,7 @@ export const blogNameValidation = body('blogName').trim().isLength({min: 1, max:
 
 // Blogs
 export const nameValidation = body('name').trim().isLength({min: 1, max: 15})
-export const youtubeUrlValidation = body('youtubeUrl').isURL().isLength({min: 1, max: 100})
+export const websiteUrlValidation = body('websiteUrl').isLength({min: 1, max: 100})
 
 // Users
 export const usersLoginValidation = body('login').isString().trim().isLength({min: 3, max: 10}).custom(async login => {

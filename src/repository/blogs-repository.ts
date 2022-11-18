@@ -62,8 +62,8 @@ export const blogsRepository = {
         await PostsCollection.insertOne({...newPost});
         return newPost
     },
-    async updateBlog(id: string, name: string, youtubeUrl: string): Promise<boolean> {
-        const result = await BlogsCollection.updateOne({id: id}, {$set: {name: name, youtubeUrl: youtubeUrl}})
+    async updateBlog(id: string, name: string, websiteUrl: string): Promise<boolean> {
+        const result = await BlogsCollection.updateOne({id: id}, {$set: {name: name, websiteUrl: websiteUrl}})
         return result.matchedCount === 1
     },
     async deleteBlog(id: string): Promise<boolean> {

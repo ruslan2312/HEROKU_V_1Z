@@ -11,7 +11,7 @@ import {
     contentValidation,
     blogNameValidation,
     nameValidation,
-    youtubeUrlValidation
+    websiteUrlValidation
 } from "../common/validator";
 
 export const blogsRouter = Router()
@@ -40,8 +40,8 @@ blogsRouter.get('/:blogId/posts',
             res.sendStatus(404)
         }
     })
-blogsRouter.post('/', mwBasicAuth, nameValidation, youtubeUrlValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const newBlog: BlogsType = await blogsService.createBlog(req.body.name, req.body.youtubeUrl)
+blogsRouter.post('/', mwBasicAuth, nameValidation, websiteUrlValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
+    const newBlog: BlogsType = await blogsService.createBlog(req.body.name, req.body.websiteUrl)
     res.status(201).send(newBlog)
 })
 blogsRouter.post('/:blogId/posts', mwBasicAuth, titleValidation, shortDescriptionValidation, contentValidation,
@@ -52,8 +52,8 @@ blogsRouter.post('/:blogId/posts', mwBasicAuth, titleValidation, shortDescriptio
         }
         res.status(404).send()
     })
-blogsRouter.put('/:id', mwBasicAuth, nameValidation, youtubeUrlValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const isUpdate: boolean = await blogsService.updateBlog(req.params.id, req.body.name, req.body.youtubeUrl)
+blogsRouter.put('/:id', mwBasicAuth, nameValidation, websiteUrlValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
+    const isUpdate: boolean = await blogsService.updateBlog(req.params.id, req.body.name, req.body.websiteUrl)
     if (isUpdate) {
         const blog = await blogsService.findBlogByID(req.params.id)
         res.status(204).send(blog)

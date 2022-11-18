@@ -14,11 +14,11 @@ export const blogsService = {
     async findBlogAndPostByID(query: FindPostByIdPaginationQueryType, blogId: string): Promise<PostsType[] | any> {
         return await blogsRepository.findBlogByPostId(query, blogId)
     },
-    async createBlog(name: string, youtubeUrl: string): Promise<BlogsType> {
+    async createBlog(name: string, websiteUrl: string): Promise<BlogsType> {
         const newBlog = {
             id: new Date().valueOf().toString(),
             name: name,
-            youtubeUrl: youtubeUrl,
+            websiteUrl: websiteUrl,
             createdAt: new Date().toISOString()
         }
         return await blogsRepository.createBlog(newBlog)
@@ -39,8 +39,8 @@ export const blogsService = {
         }
         return null
     },
-    async updateBlog(id: string, name: string, youtubeUrl: string): Promise<boolean> {
-        return await blogsRepository.updateBlog(id, name, youtubeUrl)
+    async updateBlog(id: string, name: string, websiteUrl: string): Promise<boolean> {
+        return await blogsRepository.updateBlog(id, name, websiteUrl)
     },
     async deleteBlog(id: string): Promise<boolean> {
         return await blogsRepository.deleteBlog(id)
