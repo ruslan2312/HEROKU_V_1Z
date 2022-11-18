@@ -28,7 +28,7 @@ authRouter.post('/login', authLoginValidation, authPasswordValidation, inputVali
         await deviceService.addDevice(user.id, userAgent!, ip, deviceId, time.iat, time.exp)
         res.cookie("refreshToken", token.refreshToken, {
                 httpOnly: true,
-                secure: false
+                secure: true
             },
         ).status(200).send({accessToken: token.accessToken})
     } else {
@@ -73,7 +73,7 @@ authRouter.post('/refresh-token', checkUsersByRefreshToken, inputValidationMiddl
         const token = await jwtService.createJWT(user, payload.deviceId!)
         res.cookie("refreshToken", token.refreshToken, {
                 httpOnly: true,
-                secure: false
+                secure: true
             },
         ).send({accessToken: token.accessToken}).status(200)
         const payload2: any = await deviceService.getPayload(token.refreshToken)
