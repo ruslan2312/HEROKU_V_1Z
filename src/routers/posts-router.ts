@@ -50,7 +50,6 @@ postsRouter.put('/:id', mwBasicAuth, titleValidation, shortDescriptionValidation
 postsRouter.post('/', mwBasicAuth, titleValidation, shortDescriptionValidation, contentValidation,
     blogIdValidation, blogNameValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
         const newPost = await postsService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId)
-        console.log(newPost)
         res.status(201).send(newPost);
     })
 

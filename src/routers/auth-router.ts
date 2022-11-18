@@ -11,14 +11,9 @@ import {
 import {inputValidationMiddleware} from "../middleware/Input-validation-middleware";
 import {authTokenMW} from "../middleware/authorization-middleware";
 import {authService} from "../service/auth-service";
-import {refreshTokenUpdateMiddleware} from "../middleware/refreshTokenUpdate-middleware";
+import {checkUsersByRefreshToken} from "../middleware/check-users-by-refrsh-token";
 import {deviceService} from "../service/device-service";
 import {randomUUID} from "crypto";
-import {settings} from "../settings";
-import {verify} from "jsonwebtoken";
-import jwt from "jsonwebtoken";
-import {deviceRepository} from "../repository/device-repository";
-import {log} from "util";
 
 export const authRouter = Router()
 
@@ -69,12 +64,11 @@ authRouter.post('/registration-confirmation', authRegistrationConfirm, inputVali
     } else res.sendStatus(400)
 })
 
-authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/refresh-token', checkUsersByRefreshToken, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user!
     const refreshToken = req.cookies.refreshToken
     const payload: any = await deviceService.getPayload(refreshToken)
     const checkRefreshToken = await deviceService.checkRefreshToken(user.id, payload.iat, payload.exp, payload.deviceId)
-    debugger
     if (checkRefreshToken) {
         const token = await jwtService.createJWT(user, payload.deviceId!)
         res.cookie("refreshToken", token.refreshToken, {
@@ -83,8 +77,7 @@ authRouter.post('/refresh-token', refreshTokenUpdateMiddleware, inputValidationM
             },
         ).send({accessToken: token.accessToken}).status(200)
         const payload2: any = await deviceService.getPayload(token.refreshToken)
-        debugger
-        const updateRefreshToken = await deviceService.updateRefreshToken(user.id, payload2.iat, payload2.exp, payload2.deviceId, payload.iat)
+         await deviceService.updateRefreshToken(user.id, payload2.iat, payload2.exp, payload2.deviceId, payload.iat)
     } else {
         res.sendStatus(401)
     }

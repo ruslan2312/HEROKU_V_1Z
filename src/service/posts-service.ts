@@ -33,7 +33,6 @@ export const postsService = {
                 createdAt: new Date().toISOString()
             }
             await postsRepository.createPost({...newPost})
-            console.log(newPost)
             return newPost
         }
         return null

@@ -4,6 +4,7 @@ import {randomUUID} from "crypto";
 import {usersService} from "./users-service";
 import {authRepository} from "../repository/auth-repository";
 import {deviceService} from "./device-service";
+import {deviceRepository} from "../repository/device-repository";
 
 export const authService = {
     async resentEmail(email: string): Promise<boolean | null> {
@@ -20,21 +21,17 @@ export const authService = {
         } else return null
     },
     async logout(refreshTokens: string, userAgent: string): Promise<boolean> {
-        const payload = await usersService.getTokenPayload(refreshTokens)
-        const user = await usersService.findUserById(payload.id)
+        if (!refreshTokens) return false
+        const payload = await deviceService.getPayload(refreshTokens)
+        if (!payload) return false
+        const user = await usersService.findUserById(payload.userId)
         if (user) {
             const r = await authRepository.findRefreshTokenInBlackListByRT(refreshTokens);
             if (r) return false
             else {
-               await deviceService.deleteDeviceByIdAndUserId(userAgent, user.id,)
+                await deviceRepository.deleteDeviceByIdAndUserAgent(payload.userId, payload.iat, userAgent,)
                 return await authRepository.addRefreshTokenByBlackList(refreshTokens)
             }
         } else return false;
-    },
-    async findRefreshTokenInBlackListByRT(refreshTokens: string): Promise<boolean> {
-        return await authRepository.findRefreshTokenInBlackListByRT(refreshTokens)
-    },
-    async addRefreshTokenByBlackList(refreshTokens: string): Promise<boolean> {
-        return await authRepository.addRefreshTokenByBlackList(refreshTokens)
     },
 }

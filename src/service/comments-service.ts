@@ -39,7 +39,6 @@ export const commentsService = {
         }
         await commentsRepository.createComment({...newComment})
         const result = this.transformDbTypeToResponseTypeForCreate(newComment, user)
-        console.log(result)
         return result
 
     },

@@ -9,5 +9,5 @@ export const authRepository = {
     async findRefreshTokenInBlackListByRT(refreshTokens: string): Promise<boolean> {
         const result = await RefreshTokenCollection.findOne({refreshToken: refreshTokens})
         return !!result;
-    }
+    },
 }
