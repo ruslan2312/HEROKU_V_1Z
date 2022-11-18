@@ -6,8 +6,8 @@ export const deviceRepository = {
         return DevicesCollection.find({userId: userId}, {
             projection: {
                 _id: 0,
-                refreshTokenActive: 0,
                 exp: 0,
+                refreshTokenActive: 0,
                 userId: 0
             }
         }).toArray()
