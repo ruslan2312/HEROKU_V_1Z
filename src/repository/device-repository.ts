@@ -49,7 +49,7 @@ export const deviceRepository = {
         return result.deletedCount === 1
     },
     async deleteAllDevice() {
-        await DevicesCollection.deleteMany({});
+       return  await DevicesCollection.deleteMany({});
     },
     async deleteDeviceByDeviceId(userId: string, iat: Date, deviceId: string): Promise<boolean> {
         const findDevice = await DevicesCollection.findOne({

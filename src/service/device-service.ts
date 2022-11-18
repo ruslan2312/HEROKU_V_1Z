@@ -10,7 +10,7 @@ export const deviceService = {
     async addDevice(userId: string, userAgent: string, ip: string, deviceId: string, iat: Date, exp: Date,): Promise<void> {
         const a = await this.checkDeviceByRepeat(userId, userAgent)
         if (a) {
-            await deviceRepository.updateRefreshTokenActive(userId, userAgent, iat, exp ,deviceId)
+            await deviceRepository.updateRefreshTokenActive(userId, userAgent, iat, exp, deviceId)
             return
         }
         const newDevice = {
@@ -60,7 +60,7 @@ export const deviceService = {
         return await deviceRepository.deleteDeviceByIdAndIat(userId, iat)
     },
     async deleteAllDevice() {
-        await deviceRepository.deleteAllDevice()
+        return await deviceRepository.deleteAllDevice()
     },
     async deleteDeviceByDeviceId(userId: string, iat: Date, deviceId: string): Promise<boolean> {
         return await deviceRepository.deleteDeviceByDeviceId(userId, iat, deviceId)
