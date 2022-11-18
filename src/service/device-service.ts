@@ -1,6 +1,6 @@
 import {deviceRepository} from "../repository/device-repository";
 import {DeviceResponseType} from "../types/devicesTypes";
-import jwt, {JwtPayload} from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import {settings} from "../settings";
 
 export const deviceService = {
