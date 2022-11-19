@@ -14,7 +14,7 @@ import {authService} from "../service/auth-service";
 import {checkUsersByRefreshToken} from "../middleware/check-users-by-refrsh-token";
 import {deviceService} from "../service/device-service";
 import {randomUUID} from "crypto";
-import rateLimit from "express-rate-limit";
+import rateLimit , { MemoryStore } from "express-rate-limit";
 
 export const authRouter = Router()
 const createAccountLimiter = rateLimit({
@@ -24,6 +24,7 @@ const createAccountLimiter = rateLimit({
         'Too many accounts created from this IP, please try again after an hour',
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    store: new MemoryStore(),
 })
 authRouter.post('/login', createAccountLimiter, authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = await usersService.checkCredentials(req.body.login, req.body.password)
