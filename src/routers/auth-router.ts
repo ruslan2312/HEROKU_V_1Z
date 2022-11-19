@@ -14,10 +14,18 @@ import {authService} from "../service/auth-service";
 import {checkUsersByRefreshToken} from "../middleware/check-users-by-refrsh-token";
 import {deviceService} from "../service/device-service";
 import {randomUUID} from "crypto";
+import rateLimit from "express-rate-limit";
 
 export const authRouter = Router()
-
-authRouter.post('/login', authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
+const createAccountLimiter = rateLimit({
+    windowMs: 10 * 1000, // 1 hour
+    max: 5, // Limit each IP to 5 create account requests per `window` (here, per hour)
+    message:
+        'Too many accounts created from this IP, please try again after an hour',
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+authRouter.post('/login', createAccountLimiter, authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = await usersService.checkCredentials(req.body.login, req.body.password)
     if (user) {
         const ip = req.ip
@@ -36,7 +44,7 @@ authRouter.post('/login', authLoginValidation, authPasswordValidation, inputVali
     }
 })
 
-authRouter.post('/registration', usersLoginValidation, usersPasswordValidation, usersEmailValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration', createAccountLimiter, usersLoginValidation, usersPasswordValidation, usersEmailValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const login = req.body.login
     const password = req.body.password
     const email = req.body.email
@@ -48,7 +56,7 @@ authRouter.post('/registration', usersLoginValidation, usersPasswordValidation, 
     }
 })
 
-authRouter.post('/registration-email-resending', usersEmailValidationResending, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration-email-resending', createAccountLimiter, usersEmailValidationResending, inputValidationMiddleware, async (req: Request, res: Response) => {
     const email = req.body.email
     const resendingEmail = await authService.resentEmail(email)
     if (resendingEmail) {
@@ -56,7 +64,7 @@ authRouter.post('/registration-email-resending', usersEmailValidationResending, 
     } else return res.sendStatus(400)
 })
 
-authRouter.post('/registration-confirmation', authRegistrationConfirm, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration-confirmation', createAccountLimiter, authRegistrationConfirm, inputValidationMiddleware, async (req: Request, res: Response) => {
     const code = req.body.code
     const registrationConfirm = await authService.registrationConfirm(code)
     if (registrationConfirm) {
@@ -80,7 +88,7 @@ authRouter.post('/refresh-token', checkUsersByRefreshToken, inputValidationMiddl
             },
         ).send({accessToken: token.accessToken}).status(200)
         const payload2: any = await deviceService.getPayload(token.refreshToken)
-         await deviceService.updateRefreshToken(user.id, payload2.iat, payload2.exp, payload2.deviceId, payload.iat)
+        await deviceService.updateRefreshToken(user.id, payload2.iat, payload2.exp, payload2.deviceId, payload.iat)
     } else {
         res.sendStatus(401)
     }

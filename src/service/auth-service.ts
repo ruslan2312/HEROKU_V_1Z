@@ -5,6 +5,8 @@ import {usersService} from "./users-service";
 import {authRepository} from "../repository/auth-repository";
 import {deviceService} from "./device-service";
 import {deviceRepository} from "../repository/device-repository";
+import rateLimit from 'express-rate-limit'
+
 
 export const authService = {
     async resentEmail(email: string): Promise<boolean | null> {
