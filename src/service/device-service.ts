@@ -56,6 +56,11 @@ export const deviceService = {
         if (!result) return false
         return true
     },
+  async  checkRefreshTokenByRepeatUser(userId: string, iat: Date, exp: Date, deviceId: string):Promise<boolean> {
+        const result = await deviceRepository.checkRefreshToken(userId, iat, exp, deviceId)
+        if (!result) return false
+        return true
+    },
     async deleteDeviceByIdAdnDate(userId: string, iat: Date): Promise<boolean> {
         return await deviceRepository.deleteDeviceByIdAndIat(userId, iat)
     },
@@ -65,4 +70,5 @@ export const deviceService = {
     async deleteDeviceByDeviceId(userId: string, iat: Date, deviceId: string): Promise<boolean> {
         return await deviceRepository.deleteDeviceByDeviceId(userId, iat, deviceId)
     },
+
 }
