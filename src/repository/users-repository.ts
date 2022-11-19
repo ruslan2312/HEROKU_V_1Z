@@ -10,6 +10,7 @@ export const usersRepository = {
         return this._findUsersByFilters(filter, queryData)
     },
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserDbType | null> {
+        console.log(loginOrEmail)
         return await UsersCollection.findOne({$or: [{'accountData.email': loginOrEmail}, {'accountData.login': loginOrEmail}]})
     },
     async findUserById(id: string): Promise<UserDbType | null> {
