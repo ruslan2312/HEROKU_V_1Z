@@ -27,7 +27,7 @@ const createAccountLimiter = rateLimit({
     store: new MemoryStore(),
 })
 authRouter.post('/login', createAccountLimiter, authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const user = await usersService.checkCredentials(req.body.login, req.body.password)
+    const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
     console.log(user)
     if (user) {
         const ip = req.ip
