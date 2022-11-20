@@ -43,5 +43,5 @@ devicesRouter.delete('/devices/:deviceId', checkUsersByRefreshToken, inputValida
     if (deleteDevice) {
         return res.sendStatus(204)
     }
-    res.sendStatus(404)
+    res.sendStatus(403)
 })
