@@ -4,6 +4,7 @@ import {DeviceResponseType} from "../types/devicesTypes";
 import {checkUsersByRefreshToken} from "../middleware/check-users-by-refrsh-token";
 import {inputValidationMiddleware} from "../middleware/Input-validation-middleware";
 import {usersService} from "../service/users-service";
+import {deviceRepository} from "../repository/device-repository";
 
 export const devicesRouter = Router()
 
@@ -34,6 +35,8 @@ devicesRouter.delete('/devices/', checkUsersByRefreshToken, inputValidationMiddl
 devicesRouter.delete('/devices/:deviceId', checkUsersByRefreshToken, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user!
     const refreshToken = req.cookies.refreshToken
+    const findDeviceById = await deviceRepository.findDeviceById(req.params.deviceId!)
+    if(!findDeviceById) return res.sendStatus(404)
     if (!user) return res.sendStatus(401)
     const payload: any = await deviceService.getPayload(refreshToken)
     if (!payload) return res.sendStatus(401)
