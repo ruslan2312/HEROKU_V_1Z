@@ -6,7 +6,7 @@ import {blogsRouter} from "./routers/blogs-router";
 import {postsRouter} from "./routers/posts-router";
 import {allDelete} from "./routers/all-delete";
 import {usersRouter} from "./routers/users-router";
-import {authRouter} from "./routers/auth-router";
+import {authRouter, createAccountLimiter} from "./routers/auth-router";
 import {commentsRouter} from "./routers/comments-router";
 import {emailRouter} from "./routers/email-route";
 import {devicesRouter} from "./routers/devices-router";
@@ -21,6 +21,7 @@ app.set('trust proxy', true)
 
 app.use(cookieParser())
 app.use(express.json())
+app.use(createAccountLimiter)
 
 app.use('/blogs', blogsRouter)
 app.use('/posts', postsRouter)

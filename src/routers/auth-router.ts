@@ -17,11 +17,11 @@ import {randomUUID} from "crypto";
 import rateLimit , { MemoryStore } from "express-rate-limit";
 
 export const authRouter = Router()
-const createAccountLimiter = rateLimit({
-    windowMs: 10000, // 1 hour
-    max: 5, // Limit each IP to 5 create account requests per `window` (here, per hour)
+export const createAccountLimiter = rateLimit({
+    windowMs: 10000,
+    max: 5, // Limit each IP to 5 create account requests per `window`
     message:
-        'Too many accounts created from this IP, please try again after an hour',
+        'Too many accounts created from this IP, please try again after an  10sec',
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     store: new MemoryStore(),
