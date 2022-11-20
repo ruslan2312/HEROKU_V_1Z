@@ -7,6 +7,8 @@ import {randomUUID} from "crypto";
 import {emailAdapter} from "../adapter/email-adapter";
 import jwt from "jsonwebtoken";
 import {settings} from "../settings";
+import {deviceRepository} from "../repository/device-repository";
+import {DeviceResponseType, DeviceType} from "../types/devicesTypes";
 
 export const usersService = {
     async findUsers(query: UsersPaginationQueryType): Promise<PaginationResultType> {
@@ -77,14 +79,8 @@ export const usersService = {
             return null
         }
     },
-    async getTokenPayload(token: string) {
-        try {
-            const result: any = jwt.verify(token, settings.JWT_REFRESH_SECRET)
-            return result
-        } catch (error) {
-            return null
-        }
-    },
+
+
     _generateHash(password: string) {
         return bcrypt.hash(password, 10)
     },
@@ -98,5 +94,5 @@ export const usersService = {
     },
     _compareHash(password: string, hash: string) {
         return bcrypt.compare(password, hash)
-    }
+    },
 }

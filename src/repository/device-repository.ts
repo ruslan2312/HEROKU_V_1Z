@@ -61,4 +61,14 @@ export const deviceRepository = {
         const result = await DevicesCollection.deleteOne({userId: userId, deviceId: deviceId})
         return result.deletedCount === 1
     },
+    async checkUserForDevice(userId: string): Promise<DeviceResponseType | null> {
+        return DevicesCollection.findOne({userId}, {
+            projection: {
+                _id: 0,
+                exp: 0,
+                refreshTokenActive: 0,
+                userId: 0
+            }
+        })
+    }
 }

@@ -70,5 +70,7 @@ export const deviceService = {
     async deleteDeviceByDeviceId(userId: string, iat: Date, deviceId: string): Promise<boolean> {
         return await deviceRepository.deleteDeviceByDeviceId(userId, iat, deviceId)
     },
-
+    async checkUserForDevice(userId: string):Promise<DeviceResponseType | null> {
+        return   deviceRepository.checkUserForDevice(userId)
+    },
 }

@@ -3,6 +3,7 @@ import {deviceService} from "../service/device-service";
 import {DeviceResponseType} from "../types/devicesTypes";
 import {checkUsersByRefreshToken} from "../middleware/check-users-by-refrsh-token";
 import {inputValidationMiddleware} from "../middleware/Input-validation-middleware";
+import {usersService} from "../service/users-service";
 
 export const devicesRouter = Router()
 
@@ -28,7 +29,7 @@ devicesRouter.delete('/devices/', checkUsersByRefreshToken, inputValidationMiddl
     if (deleteDevice) {
         return res.sendStatus(204)
     }
-    res.sendStatus(404)
+    res.sendStatus(401)
 })
 devicesRouter.delete('/devices/:deviceId', checkUsersByRefreshToken, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user!
@@ -36,10 +37,11 @@ devicesRouter.delete('/devices/:deviceId', checkUsersByRefreshToken, inputValida
     if (!user) return res.sendStatus(404)
     const payload: any = await deviceService.getPayload(refreshToken)
     if (!payload) return res.sendStatus(401)
-    console.log(req.params.deviceId)
+    const checkUserForDevice = await deviceService.checkUserForDevice(user.id!)
+    if (!checkUserForDevice) return res.sendStatus(403)
     const deleteDevice = await deviceService.deleteDeviceByDeviceId(payload.userId, payload.iat, req.params.deviceId!)
     if (deleteDevice) {
         return res.sendStatus(204)
     }
-    res.sendStatus(403)
+    res.sendStatus(404)
 })
