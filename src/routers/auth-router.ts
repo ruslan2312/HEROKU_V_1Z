@@ -26,7 +26,7 @@ export const createAccountLimiter = rateLimit({
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     store: new MemoryStore(),
 })
-authRouter.post('/login',  authLoginValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/login', responseCountMiddleware, authLoginValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
     if (user) {
         const deviceId = randomUUID()
