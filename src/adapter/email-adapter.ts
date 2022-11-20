@@ -16,7 +16,7 @@ export const emailAdapter = {
             },
         });
         // send mail with defined transport object
-        await transporter.sendMail({
+        transporter.sendMail({
             from: '"RUSEL" <heeca@mail.ru>', // sender address
             to: email, // list of receivers
             subject: subject, // Subject line
