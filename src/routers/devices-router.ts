@@ -13,7 +13,7 @@ devicesRouter.get('/devices', checkUsersByRefreshToken, inputValidationMiddlewar
     if (!payload) return res.sendStatus(401)
     if (user) {
         const findDevice: DeviceResponseType[] = await deviceService.getAllUserDevice(payload.userId)
-        res.send(findDevice)
+        res.sendStatus(204)
     } else {
         res.sendStatus(401)
     }
