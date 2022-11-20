@@ -17,6 +17,7 @@ export const BlogsCollection = db.collection<BlogsType>("blogs")
 export const PostsCollection = db.collection<PostsType>("posts")
 export const UsersCollection = db.collection <UserDbType>("users")
 export const DevicesCollection = db.collection<DeviceType>("device")
+export const requestDbCollection = db.collection<any>("requestDb")
 
 export async function runDb() {
     try {

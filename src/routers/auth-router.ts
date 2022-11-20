@@ -15,6 +15,7 @@ import {checkUsersByRefreshToken} from "../middleware/check-users-by-refrsh-toke
 import {deviceService} from "../service/device-service";
 import {randomUUID} from "crypto";
 import rateLimit , { MemoryStore } from "express-rate-limit";
+import {responseCountMiddleware} from "../middleware/createAccountLimiter";
 
 export const authRouter = Router()
 export const createAccountLimiter = rateLimit({
@@ -25,7 +26,7 @@ export const createAccountLimiter = rateLimit({
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     store: new MemoryStore(),
 })
-authRouter.post('/login', createAccountLimiter, authLoginValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/login', responseCountMiddleware, authLoginValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
     if (user) {
         const deviceId = randomUUID()
@@ -42,7 +43,7 @@ authRouter.post('/login', createAccountLimiter, authLoginValidation, inputValida
     }
 })
 
-authRouter.post('/registration', createAccountLimiter, usersLoginValidation, usersPasswordValidation, usersEmailValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration', responseCountMiddleware, usersLoginValidation, usersPasswordValidation, usersEmailValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const login = req.body.login
     const password = req.body.password
     const email = req.body.email
@@ -54,7 +55,7 @@ authRouter.post('/registration', createAccountLimiter, usersLoginValidation, use
     }
 })
 
-authRouter.post('/registration-email-resending', createAccountLimiter, usersEmailValidationResending, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration-email-resending', responseCountMiddleware, usersEmailValidationResending, inputValidationMiddleware, async (req: Request, res: Response) => {
     const email = req.body.email
     const resendingEmail = await authService.resentEmail(email)
     if (resendingEmail) {
@@ -62,7 +63,7 @@ authRouter.post('/registration-email-resending', createAccountLimiter, usersEmai
     } else return res.sendStatus(400)
 })
 
-authRouter.post('/registration-confirmation', createAccountLimiter, authRegistrationConfirm, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration-confirmation', responseCountMiddleware, authRegistrationConfirm, inputValidationMiddleware, async (req: Request, res: Response) => {
     const code = req.body.code
     const registrationConfirm = await authService.registrationConfirm(code)
     if (registrationConfirm) {
@@ -72,10 +73,8 @@ authRouter.post('/registration-confirmation', createAccountLimiter, authRegistra
 
 authRouter.post('/refresh-token', checkUsersByRefreshToken, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user!
-    console.log(1)
     const refreshToken = req.cookies.refreshToken
     const payload: any = await deviceService.getPayload(refreshToken)
-    console.log(user.id, payload.iat, payload.exp, payload.deviceId)
 
     const checkRefreshToken = await deviceService.checkRefreshToken(user.id, payload.iat, payload.exp, payload.deviceId)
     if (checkRefreshToken) {
