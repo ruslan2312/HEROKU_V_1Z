@@ -58,6 +58,7 @@ authRouter.post('/registration', responseCountMiddleware, usersLoginValidation, 
 authRouter.post('/registration-email-resending', responseCountMiddleware, usersEmailValidationResending, inputValidationMiddleware, async (req: Request, res: Response) => {
     const email = req.body.email
     const resendingEmail = await authService.resentEmail(email)
+    console.log(resendingEmail)
     if (resendingEmail) {
         res.sendStatus(204)
     } else return res.sendStatus(400)
@@ -75,7 +76,6 @@ authRouter.post('/refresh-token', checkUsersByRefreshToken, inputValidationMiddl
     const user = req.user!
     const refreshToken = req.cookies.refreshToken
     const payload: any = await deviceService.getPayload(refreshToken)
-
     const checkRefreshToken = await deviceService.checkRefreshToken(user.id, payload.iat, payload.exp, payload.deviceId)
     if (checkRefreshToken) {
         const token = await jwtService.createJWT(user, payload.deviceId!)

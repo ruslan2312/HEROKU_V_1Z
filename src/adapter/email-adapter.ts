@@ -15,7 +15,6 @@ export const emailAdapter = {
                 pass: mailAccount.pass, // generated ethereal password
             },
         });
-        // send mail with defined transport object
         transporter.sendMail({
             from: '"RUSEL" <heeca@mail.ru>', // sender address
             to: email, // list of receivers

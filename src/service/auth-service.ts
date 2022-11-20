@@ -13,7 +13,8 @@ export const authService = {
         const newConfirmationCode = randomUUID()
         const updateUserConfirmCodeByEmail = await usersRepository.updateUserConfirmationCodeByEmail(email, newConfirmationCode);
         if (updateUserConfirmCodeByEmail) {
-            return await emailAdapter.sendMail(email, "Resending", newConfirmationCode)
+            const res = await emailAdapter.sendMail(email, "Resending", newConfirmationCode)
+            return res
         } else return null
     },
     async registrationConfirm(code: string): Promise<boolean | null> {
