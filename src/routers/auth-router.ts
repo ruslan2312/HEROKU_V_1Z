@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {usersService} from "../service/users-service";
 import {jwtService} from "../application/jwt-service";
 import {
-    authLoginValidation, authPasswordValidation, authRegistrationConfirm,
+    authLoginValidation, authRegistrationConfirm,
     usersEmailValidation,
     usersEmailValidationResending,
     usersLoginValidation,
@@ -18,7 +18,7 @@ import rateLimit , { MemoryStore } from "express-rate-limit";
 
 export const authRouter = Router()
 export const createAccountLimiter = rateLimit({
-    windowMs: 1000000,
+    windowMs: 10000,
     max: 5, // Limit each IP to 5 create account requests per `window`
     message:
         'Too many accounts created from this IP, please try again after an  10sec',
@@ -26,7 +26,7 @@ export const createAccountLimiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     store: new MemoryStore(),
 })
-authRouter.post('/login', createAccountLimiter, authLoginValidation, authPasswordValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/login', createAccountLimiter, authLoginValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
     console.log(req.body.loginOrEmail, 'asjdfjhaskfdadsfadf')
     console.log(user)

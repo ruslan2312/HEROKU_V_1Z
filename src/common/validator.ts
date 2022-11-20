@@ -36,8 +36,8 @@ export const usersEmailValidationResending = body('email').isEmail().trim().isLe
 export const commentsContentValidation = body('content').trim().isLength({min: 20, max: 300})
 
 // Auth
-export const authLoginValidation = body('loginOrEmail').isString().trim().isLength({min: 3, max: 30})
-export const authPasswordValidation = body('password').isString().trim().isLength({min: 6, max: 20})
+export const authLoginValidation = [ body('loginOrEmail').isString().trim().isLength({min: 3, max: 30}),
+body('password').isString().trim().isLength({min: 6, max: 20}) ]
 export const authRegistrationConfirm = body('code').isString().trim().isLength({
     min: 5,
     max: 150
