@@ -48,7 +48,7 @@ export const deviceRepository = {
         const findUser = await DevicesCollection.find({userId, lastActiveDate: iat.toISOString()}).toArray()
         if (!findUser) return false
         if (findUser.length === 1) return true
-        const result = await DevicesCollection.deleteMany({userId: userId, lastActiveDate: {$ne: iat.toISOString()}})
+        const result = await DevicesCollection.deleteMany({userId: userId, lastActiveDate: {$nin: [iat.toISOString()]}})
         return result.deletedCount === 1
     },
     async deleteAllDevice() {
