@@ -13,14 +13,14 @@ export const deviceRepository = {
         }).toArray()
     },
     async addDevice(newDevice: any) {
-        return await DevicesCollection.insertOne({...newDevice})
+        return DevicesCollection.insertOne({...newDevice})
     },
     async checkDeviceByRepeat(userId: string, userAgent: string): Promise<boolean> {
         const result = await DevicesCollection.findOne({userId: userId, title: userAgent})
         return !!result;
     },
     async updateRefreshTokenActive(userId: string, userAgent: string, iat: Date, exp: Date, deviceId: string) {
-        return await DevicesCollection.updateOne({
+        return DevicesCollection.updateOne({
             userId,
             title: userAgent,
         }, {$set: {lastActiveDate: iat.toISOString(), exp: exp.toISOString(), deviceId: deviceId}})

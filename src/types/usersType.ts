@@ -12,7 +12,6 @@ export type UserType = {
     email: string,
     createdAt: string,
     passwordHash: string,
-    passwordSalt: string,
 }
 
 export type UserDbType = {
@@ -21,7 +20,6 @@ export type UserDbType = {
         login: string,
         email: string,
         passwordHash: string,
-        passwordSalt: string,
         createdAt: string,
     },
     emailConfirmation: {

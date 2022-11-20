@@ -24,7 +24,7 @@ export const deviceService = {
         await deviceRepository.addDevice(newDevice)
     },
     async checkDeviceByRepeat(userId: string, userAgent: string): Promise<boolean> {
-        return await deviceRepository.checkDeviceByRepeat(userId, userAgent);
+        return deviceRepository.checkDeviceByRepeat(userId, userAgent);
     },
 
     async getIatAndExpToken(refreshToken: string): Promise<any> {

@@ -18,25 +18,20 @@ import rateLimit , { MemoryStore } from "express-rate-limit";
 
 export const authRouter = Router()
 export const createAccountLimiter = rateLimit({
-    windowMs: 10000,
+    windowMs: 12000,
     max: 5, // Limit each IP to 5 create account requests per `window`
     message:
         'Too many accounts created from this IP, please try again after an  10sec',
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     store: new MemoryStore(),
 })
 authRouter.post('/login', createAccountLimiter, authLoginValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
-    console.log(req.body.loginOrEmail, 'asjdfjhaskfdadsfadf')
-    console.log(user)
     if (user) {
-        const ip = req.ip
         const deviceId = randomUUID()
-        const userAgent = req.headers["user-agent"]
         const token = await jwtService.createJWT(user, deviceId)
         const time = await deviceService.getIatAndExpToken(token.refreshToken)
-        await deviceService.addDevice(user.id, userAgent!, ip, deviceId, time.iat, time.exp)
+        await deviceService.addDevice(user.id, req.headers["user-agent"]!, req.ip, deviceId, time.iat, time.exp)
         res.cookie("refreshToken", token.refreshToken, {
                 httpOnly: true,
                 secure: true

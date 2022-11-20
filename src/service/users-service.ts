@@ -21,7 +21,6 @@ export const usersService = {
                 email: findUserById.accountData.email,
                 createdAt: findUserById.accountData.createdAt,
                 passwordHash: findUserById.accountData.createdAt,
-                passwordSalt: findUserById.accountData.passwordSalt
             }
         } else return null
 
@@ -30,15 +29,13 @@ export const usersService = {
         return usersRepository.findByLoginOrEmail(loginOrEmail)
     },
     async createUser(login: string, email: string, password: string): Promise<UserResponseType> {
-        const passwordSalt = await bcrypt.genSalt(10);
-        const passwordHash = await this._generateHash(password, passwordSalt)
+        const passwordHash = await this._generateHash(password)
         const newUser: UserDbType = {
             id: new Date().valueOf().toString(),
             accountData: {
                 login: login,
                 email: email,
                 passwordHash,
-                passwordSalt,
                 createdAt: new Date().toISOString()
             },
             emailConfirmation: {
@@ -68,8 +65,8 @@ export const usersService = {
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail)
         console.log(user)
         if (!user) return false
-        const passwordHash = await this._generateHash(password, user.accountData.passwordSalt)
-        if (user.accountData.passwordHash === passwordHash) {
+        const passwordHash = await this._compareHash(password, user.accountData.passwordHash)
+        if (passwordHash) {
             return user
         } else return null;
     },
@@ -89,8 +86,8 @@ export const usersService = {
             return null
         }
     },
-    async _generateHash(password: string, salt: string) {
-        return await bcrypt.hash(password, salt)
+    _generateHash(password: string) {
+        return bcrypt.hash(password, 10)
     },
     transformDbTypeToResponseTypeForFindUsers(findUsers: UserType) {
         return {
@@ -100,4 +97,7 @@ export const usersService = {
             createdAt: findUsers.createdAt
         }
     },
+    _compareHash(password: string, hash: string) {
+        return bcrypt.compare(password, hash)
+    }
 }
