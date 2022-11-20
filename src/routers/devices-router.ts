@@ -34,7 +34,7 @@ devicesRouter.delete('/devices/', checkUsersByRefreshToken, inputValidationMiddl
 devicesRouter.delete('/devices/:deviceId', checkUsersByRefreshToken, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user!
     const refreshToken = req.cookies.refreshToken
-    if (!user) return res.sendStatus(404)
+    if (!user) return res.sendStatus(403)
     const payload: any = await deviceService.getPayload(refreshToken)
     if (!payload) return res.sendStatus(401)
     const checkUserForDevice = await deviceService.checkUserForDevice(user.id!)
