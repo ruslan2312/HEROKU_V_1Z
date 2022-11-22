@@ -68,7 +68,7 @@ export const deviceRepository = {
             }
         })
     },
-    async findDeviceById(deviceId: string) {
+    async findDeviceById(deviceId: string):Promise<any> {
         const findDevice = await DevicesCollection.findOne({deviceId}, {
             projection: {
                 _id: 0,
