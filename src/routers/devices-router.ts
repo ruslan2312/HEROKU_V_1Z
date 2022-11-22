@@ -36,12 +36,12 @@ devicesRouter.delete('/devices/:deviceId', checkUsersByRefreshToken, inputValida
     const user = req.user!
     const refreshToken = req.cookies.refreshToken
     const findDeviceById = await deviceRepository.findDeviceById(req.params.deviceId!)
-    if(!findDeviceById) return res.sendStatus(404)
+    if (!findDeviceById) return res.sendStatus(404)
     if (!user) return res.sendStatus(401)
     const payload: any = await deviceService.getPayload(refreshToken)
     if (!payload) return res.sendStatus(401)
     if (findDeviceById.id !== payload.userId) return res.sendStatus(403)
-    const deleteDevice = await deviceService.deleteDeviceByDeviceId(payload.userId, payload.iat, req.params.deviceId!)
+    const deleteDevice = await deviceService.deleteDeviceByDeviceId(payload.userId, req.params.deviceId!)
     if (deleteDevice) {
         return res.sendStatus(204)
     }

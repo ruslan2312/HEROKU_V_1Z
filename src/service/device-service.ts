@@ -56,7 +56,7 @@ export const deviceService = {
         if (!result) return false
         return true
     },
-  async  checkRefreshTokenByRepeatUser(userId: string, iat: Date, exp: Date, deviceId: string):Promise<boolean> {
+    async checkRefreshTokenByRepeatUser(userId: string, iat: Date, exp: Date, deviceId: string): Promise<boolean> {
         const result = await deviceRepository.checkRefreshToken(userId, iat, exp, deviceId)
         if (!result) return false
         return true
@@ -67,10 +67,10 @@ export const deviceService = {
     async deleteAllDevice() {
         return await deviceRepository.deleteAllDevice()
     },
-    async deleteDeviceByDeviceId(userId: string, iat: Date, deviceId: string): Promise<boolean> {
-        return await deviceRepository.deleteDeviceByDeviceId(userId, iat, deviceId)
+    async deleteDeviceByDeviceId(userId: string, deviceId: string): Promise<boolean> {
+        return await deviceRepository.deleteDeviceByDeviceId(userId, deviceId)
     },
-    async checkUserForDevice(userId: string):Promise<DeviceResponseType | null> {
-        return   deviceRepository.checkUserForDevice(userId)
+    async checkUserForDevice(userId: string): Promise<DeviceResponseType | null> {
+        return deviceRepository.checkUserForDevice(userId)
     },
 }
