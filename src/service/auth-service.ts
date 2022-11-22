@@ -29,12 +29,8 @@ export const authService = {
         if (!payload) return false
         const user = await usersService.findUserById(payload.userId)
         if (user) {
-            const r = await authRepository.findRefreshTokenInBlackListByRT(refreshTokens);
-            if (r) return false
-            else {
-                await deviceRepository.deleteDeviceByIdAndUserAgent(payload.userId, payload.iat, userAgent,)
-                return await authRepository.addRefreshTokenByBlackList(refreshTokens)
-            }
+            await deviceRepository.deleteDeviceByIdAndUserAgent(payload.userId, payload.iat, userAgent,)
+            return await authRepository.addRefreshTokenByBlackList(refreshTokens)
         } else return false;
     },
 }
