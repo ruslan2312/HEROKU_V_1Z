@@ -40,7 +40,6 @@ export const deviceRepository = {
         const result = await DevicesCollection.deleteOne({
             userId: userId,
             lastActiveDate: iat.toISOString(),
-            title: userAgent
         })
         return result.deletedCount === 1
     },
