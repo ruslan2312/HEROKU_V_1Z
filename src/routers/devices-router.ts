@@ -27,7 +27,6 @@ devicesRouter.delete('/devices/', checkUsersByRefreshToken, inputValidationMiddl
     const payload: any = await deviceService.getPayload(refreshToken)
     if (!payload) return res.sendStatus(401)
     const deleteDevice = await deviceService.deleteDeviceByIdAdnDate(payload.userId, payload.deviceId)
-    console.log(deleteDevice)
     if (deleteDevice) {
         return res.sendStatus(204)
     }
@@ -43,7 +42,6 @@ devicesRouter.delete('/devices/:deviceId', checkUsersByRefreshToken, inputValida
     if (!payload) return res.sendStatus(401)
     if (findDeviceById.userId !== payload.userId) return res.sendStatus(403)
     const deleteDevice = await deviceService.deleteDeviceByDeviceId(payload.userId, findDeviceById.deviceId)
-    console.log(deleteDevice, 'true if deleted')
     if (deleteDevice) {
         return res.sendStatus(204)
     }
