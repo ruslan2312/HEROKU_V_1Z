@@ -45,11 +45,14 @@ export const deviceRepository = {
         return result.deletedCount === 1
     },
     async deleteDeviceByIdAndIat(userId: string, deviceId: string): Promise<boolean> {
-       const findDevice = await DevicesCollection.find({userId}).toArray()
-        if(findDevice.length === 1 ) return true
+        const findDevice = await DevicesCollection.find({userId}).toArray()
+        if (findDevice.length === 1) return true
         console.log(userId, deviceId)
         const result = await DevicesCollection.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
-        return result.deletedCount === 1
+        if (result) {
+            return true
+        }
+        return false
     },
     async deleteAllDevice() {
         return await DevicesCollection.deleteMany({});
@@ -68,15 +71,14 @@ export const deviceRepository = {
             }
         })
     },
-    async findDeviceById(deviceId: string):Promise<any> {
-        const findDevice = await DevicesCollection.findOne({deviceId}, {
+    async findDeviceById(deviceId: string): Promise<any> {
+        return await DevicesCollection.findOne({deviceId}, {
             projection: {
                 _id: 0,
                 exp: 0,
                 refreshTokenActive: 0,
             }
-        })
-        return findDevice;
+        });
     }
 
 }
