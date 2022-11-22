@@ -61,8 +61,8 @@ export const deviceService = {
         if (!result) return false
         return true
     },
-    async deleteDeviceByIdAdnDate(userId: string, iat: Date): Promise<boolean> {
-        return await deviceRepository.deleteDeviceByIdAndIat(userId, iat)
+    async deleteDeviceByIdAdnDate(userId: string, deviceId: string): Promise<boolean> {
+        return await deviceRepository.deleteDeviceByIdAndIat(userId, deviceId)
     },
     async deleteAllDevice() {
         return await deviceRepository.deleteAllDevice()

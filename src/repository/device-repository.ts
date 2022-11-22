@@ -44,11 +44,8 @@ export const deviceRepository = {
         })
         return result.deletedCount === 1
     },
-    async deleteDeviceByIdAndIat(userId: string, iat: Date): Promise<boolean> {
-        const findUser = await DevicesCollection.find({userId, lastActiveDate: iat.toISOString()}).toArray()
-        if (!findUser) return false
-        if (findUser.length === 1) return true
-        const result = await DevicesCollection.deleteMany({userId: userId, lastActiveDate: {$ne: iat.toISOString()}})
+    async deleteDeviceByIdAndIat(userId: string, deviceId: string): Promise<boolean> {
+        const result = await DevicesCollection.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
         return result.deletedCount === 1
     },
     async deleteAllDevice() {
