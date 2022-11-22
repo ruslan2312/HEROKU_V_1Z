@@ -45,6 +45,9 @@ export const deviceRepository = {
         return result.deletedCount === 1
     },
     async deleteDeviceByIdAndIat(userId: string, deviceId: string): Promise<boolean> {
+       const findDevice = await DevicesCollection.find({userId}).toArray()
+        if(findDevice.length === 1 ) return true
+        console.log(userId, deviceId)
         const result = await DevicesCollection.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
         return result.deletedCount === 1
     },
