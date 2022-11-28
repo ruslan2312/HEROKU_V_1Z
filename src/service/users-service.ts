@@ -7,8 +7,6 @@ import {randomUUID} from "crypto";
 import {emailAdapter} from "../adapter/email-adapter";
 import jwt from "jsonwebtoken";
 import {settings} from "../settings";
-import {deviceRepository} from "../repository/device-repository";
-import {DeviceResponseType, DeviceType} from "../types/devicesTypes";
 
 export const usersService = {
     async findUsers(query: UsersPaginationQueryType): Promise<PaginationResultType> {
@@ -27,9 +25,7 @@ export const usersService = {
         } else return null
 
     },
-    async findUserByLoginOrEmail(loginOrEmail: string): Promise<any> {
-        return usersRepository.findByLoginOrEmail(loginOrEmail)
-    },
+
     async createUser(login: string, email: string, password: string): Promise<UserResponseType> {
         const passwordHash = await this._generateHash(password)
         const newUser: UserDbType = {
@@ -42,12 +38,14 @@ export const usersService = {
             },
             emailConfirmation: {
                 confirmationCode: randomUUID(),
+                recoveryCode: randomUUID(),
                 expirationData: add(new Date(), {
                     hours: 1
                 }),
                 isConfirmed: false
             }
         }
+
         await usersRepository.createUser(newUser)
         await emailAdapter.sendMail(email, "Registr", newUser.emailConfirmation.confirmationCode)
         return {

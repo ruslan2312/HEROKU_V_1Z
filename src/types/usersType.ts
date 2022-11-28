@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export type UsersPaginationQueryType = {
     searchLoginTerm: string,
     searchEmailTerm: string,
@@ -25,6 +27,7 @@ export type UserDbType = {
     emailConfirmation: {
         confirmationCode: any,
         expirationData: Date,
+        recoveryCode: any,
         isConfirmed: boolean,
     }
 }
@@ -35,3 +38,18 @@ export type UserResponseType = {
     createdAt: string,
 }
 
+export const newUsersScheme = new mongoose.Schema({
+    id: String,
+    accountData: {
+        login: String,
+        email: String,
+        passwordHash: String,
+        createdAt: String,
+    },
+    emailConfirmation: {
+        confirmationCode: String,
+        expirationData: Date,
+        recoveryCode: String,
+        isConfirmed: Boolean,
+    }
+})

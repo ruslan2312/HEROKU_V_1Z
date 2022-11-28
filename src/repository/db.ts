@@ -1,29 +1,32 @@
-import {MongoClient} from "mongodb"
-import {CommentsType} from "../types/commentsType";
-import {UserDbType} from "../types/usersType"
-import {PostsType} from "../types/postsType"
-import {BlogsType} from "../types/blogsType"
+import {CommentsType, newCommentsScheme} from "../types/commentsType";
+import {newUsersScheme} from "../types/usersType"
+import {newPostsScheme} from "../types/postsType"
+import {newBloggersScheme} from "../types/blogsType"
 import {settings} from "../settings";
-import {DeviceType} from "../types/devicesTypes";
+import mongoose from 'mongoose'
+import {newDevicesScheme} from "../types/devicesTypes";
+import {newReqScheme} from "../types/type";
+
 
 const mongoUri = settings.MONGO_URI
 
-const client = new MongoClient(mongoUri)
 
-const db = client.db("Profile")
-export const RefreshTokenCollection = db.collection<RefreshTokenType>('refreshToken')
-export const CommentsCollection = db.collection<CommentsType>("comments")
-export const BlogsCollection = db.collection<BlogsType>("blogs")
-export const PostsCollection = db.collection<PostsType>("posts")
-export const UsersCollection = db.collection <UserDbType>("users")
-export const DevicesCollection = db.collection<DeviceType>("device")
-export const requestDbCollection = db.collection<any>("requestDb")
+export const CommentsModel = mongoose.model<CommentsType>('comments', newCommentsScheme)
+export const BlogsModel = mongoose.model('blogs', newBloggersScheme)
+export const PostsModel = mongoose.model('posts', newPostsScheme)
+
+export const UsersModel = mongoose.model('users', newUsersScheme)
+export const DevicesModel = mongoose.model('devices', newDevicesScheme)
+
+export const requestDbModel = mongoose.model('requestDb', newReqScheme)
 
 export async function runDb() {
     try {
-        await client.connect()
-        await client.db('blogs').command({ping: 1})
+        await mongoose.connect(mongoUri);
+        console.log("Connected successfully to mongo server");
     } catch {
-        await client.close()
+        console.log("Can't connect to db");
+        // Ensures that the client will close when you finish/error
+        await mongoose.disconnect()
     }
 }

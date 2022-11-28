@@ -1,4 +1,4 @@
-import {PostsCollection} from "./db";
+import {PostsModel} from "./db";
 import {
     PostPaginationQueryType,
     PostsType
@@ -7,27 +7,28 @@ import {paginationResult, PaginationResultType} from "../helpers/paginathion";
 
 export const posts: PostsType [] = [];
 
+
 export const postsRepository = {
     async findPost(queryData: PostPaginationQueryType): Promise<PaginationResultType> {
-        const totalCount = await PostsCollection.countDocuments({})
+        const totalCount = await PostsModel.countDocuments({})
         const page = Number(queryData.pageNumber)
         const pageSize = Number(queryData.pageSize)
-        const items = await PostsCollection.find({}, {projection: {_id: 0}})
-            .sort(queryData.sortBy, queryData.sortDirection)
+        const items = await PostsModel.find({}, {_id: 0, __v:0})
+            .sort([[queryData.sortBy, queryData.sortDirection]])
             .skip((page - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean() as []
         return paginationResult(page, pageSize, totalCount, items)
     },
     async findPostByID(id: string): Promise<PostsType | null> {
-        return PostsCollection.findOne({id: id}, {projection: {_id: 0}})
+        return PostsModel.findOne({id: id}, {_id: 0, __v:0})
     },
     async deletePost(id: string): Promise<boolean> {
-        const result = await PostsCollection.deleteOne({id: id})
+        const result = await PostsModel.deleteOne({id: id})
         return result.deletedCount === 1
     },
     async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
-        const result = await PostsCollection.updateOne({id: id}, {
+        const result = await PostsModel.updateOne({id: id}, {
             $set: {
                 title: title,
                 shortDescription: shortDescription,
@@ -38,11 +39,11 @@ export const postsRepository = {
         return result.matchedCount === 1
     },
     async createPost(newPost: PostsType): Promise<PostsType> {
-        await PostsCollection.insertOne({...newPost});
+        await PostsModel.insertMany([newPost]);
         return newPost
     },
     async deleteAllPosts(): Promise<boolean> {
-        const result = await PostsCollection.deleteMany({})
+        const result = await PostsModel.deleteMany({})
         return result.deletedCount === 1
     },
 }

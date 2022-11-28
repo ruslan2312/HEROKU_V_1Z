@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export type CommentsResponseType = {
     id: string,
     content: string,
@@ -21,3 +23,12 @@ export type  CommentsPaginationQueryType = {
     sortBy: string,
     sortDirection: "asc" | "desc";
 }
+
+export const newCommentsScheme = new mongoose.Schema({
+    id: String,
+    parentId: String,
+    content: String,
+    userId: String,
+    userLogin: String,
+    createdAt: String
+})

@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {usersService} from "../service/users-service";
 import {jwtService} from "../application/jwt-service";
 import {
-    authLoginValidation, authRegistrationConfirm,
+    authLoginValidation, authRegistrationConfirm, codeValidator, passwordRecoveryEmail,
     usersEmailValidation,
     usersEmailValidationResending,
     usersLoginValidation,
@@ -14,18 +14,10 @@ import {authService} from "../service/auth-service";
 import {checkUsersByRefreshToken} from "../middleware/check-users-by-refrsh-token";
 import {deviceService} from "../service/device-service";
 import {randomUUID} from "crypto";
-import rateLimit , { MemoryStore } from "express-rate-limit";
 import {responseCountMiddleware} from "../middleware/createAccountLimiter";
 
 export const authRouter = Router()
-export const createAccountLimiter = rateLimit({
-    windowMs: 10000,
-    max: 5, // Limit each IP to 5 create account requests per `window`
-    message:
-        'Too many accounts created from this IP, please try again after an  10sec',
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    store: new MemoryStore(),
-})
+
 authRouter.post('/login', responseCountMiddleware, authLoginValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
     if (user) {
@@ -35,7 +27,7 @@ authRouter.post('/login', responseCountMiddleware, authLoginValidation, inputVal
         await deviceService.addDevice(user.id, req.headers["user-agent"]!, req.ip, deviceId, time.iat, time.exp)
         res.cookie("refreshToken", token.refreshToken, {
                 httpOnly: true,
-                secure: true
+                secure: false
             },
         ).status(200).send({accessToken: token.accessToken})
     } else {
@@ -54,7 +46,22 @@ authRouter.post('/registration', responseCountMiddleware, usersLoginValidation, 
         res.sendStatus(400)
     }
 })
-
+authRouter.post('/password-recovery', responseCountMiddleware, passwordRecoveryEmail, inputValidationMiddleware, async (req: Request, res: Response) => {
+    const email = req.body.email
+    const passwordRecovery = await authService.passwordRecovery(email)
+    console.log(passwordRecovery)
+    if (passwordRecovery) {
+        res.sendStatus(204)
+    } else return res.sendStatus(400)
+})
+authRouter.post('/new-password', responseCountMiddleware, codeValidator, inputValidationMiddleware, async (req: Request, res: Response) => {
+    const code = req.body.code
+    const password = req.body.password
+    const registrationConfirm = await authService.passwordRecoveryConfirm(code, password)
+    if (registrationConfirm) {
+        res.sendStatus(204)
+    } else res.sendStatus(400)
+})
 authRouter.post('/registration-email-resending', responseCountMiddleware, usersEmailValidationResending, inputValidationMiddleware, async (req: Request, res: Response) => {
     const email = req.body.email
     const resendingEmail = await authService.resentEmail(email)
@@ -63,7 +70,6 @@ authRouter.post('/registration-email-resending', responseCountMiddleware, usersE
         res.sendStatus(204)
     } else return res.sendStatus(400)
 })
-
 authRouter.post('/registration-confirmation', responseCountMiddleware, authRegistrationConfirm, inputValidationMiddleware, async (req: Request, res: Response) => {
     const code = req.body.code
     const registrationConfirm = await authService.registrationConfirm(code)
@@ -71,6 +77,7 @@ authRouter.post('/registration-confirmation', responseCountMiddleware, authRegis
         res.sendStatus(204)
     } else res.sendStatus(400)
 })
+
 
 authRouter.post('/refresh-token', checkUsersByRefreshToken, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user!
@@ -81,7 +88,7 @@ authRouter.post('/refresh-token', checkUsersByRefreshToken, inputValidationMiddl
         const token = await jwtService.createJWT(user, payload.deviceId!)
         res.cookie("refreshToken", token.refreshToken, {
                 httpOnly: true,
-                secure: true
+                secure: false
             },
         ).send({accessToken: token.accessToken}).status(200)
         const payload2: any = await deviceService.getPayload(token.refreshToken)

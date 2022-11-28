@@ -2,10 +2,9 @@ import {emailAdapter} from "../adapter/email-adapter";
 import {usersRepository} from "../repository/users-repository";
 import {randomUUID} from "crypto";
 import {usersService} from "./users-service";
-import {authRepository} from "../repository/auth-repository";
 import {deviceService} from "./device-service";
 import {deviceRepository} from "../repository/device-repository";
-import rateLimit from 'express-rate-limit'
+import bcrypt from "bcrypt";
 
 
 export const authService = {
@@ -31,5 +30,18 @@ export const authService = {
         if (user) {
             return await deviceRepository.deleteDeviceByIdAndUserAgent(payload.userId, payload.iat, userAgent,)
         } else return false;
+    },
+    async passwordRecovery(email: string): Promise<boolean> {
+        const NewRecoveryCode = randomUUID()
+        await usersRepository.updateUserRecoveryPasswordCodeByEmail(email, NewRecoveryCode);
+        await emailAdapter.sendMailRecoveryPassword(email, "RecoveryPassword", NewRecoveryCode)
+        return true
+    },
+    async passwordRecoveryConfirm(code: string, password: string): Promise<boolean | null> {
+        const newPassword = await bcrypt.hash(password, 10)
+        const updateIsConfirmed = await usersRepository.updatePasswordRecoveryCode(code, newPassword)
+        if (updateIsConfirmed) {
+            return true
+        } else return null
     },
 }

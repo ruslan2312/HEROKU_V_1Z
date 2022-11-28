@@ -1,4 +1,4 @@
-import { UsersCollection} from "./db";
+import {UsersModel} from "./db";
 import {UserDbType, UserResponseType, UsersPaginationQueryType} from "../types/usersType";
 import {Filter} from "mongodb";
 import {paginationResult, PaginationResultType} from "../helpers/paginathion";
@@ -10,21 +10,22 @@ export const usersRepository = {
         return this._findUsersByFilters(filter, queryData)
     },
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserDbType | null> {
-        return UsersCollection.findOne({$or: [{'accountData.email': loginOrEmail}, {'accountData.login': loginOrEmail}]})
+        return UsersModel.findOne({$or: [{'accountData.email': loginOrEmail}, {'accountData.login': loginOrEmail}]})
     },
     async findUserById(id: string): Promise<UserDbType | null> {
-        return await UsersCollection.findOne({id: id}, {projection: {_id: 0}})
+        return UsersModel.findOne({id: id}, {projection: {_id: 0}});
     },
     async createUser(user: UserDbType): Promise<UserDbType> {
-        await UsersCollection.insertOne({...user});
+        console.log(user)
+        await UsersModel.insertMany([{...user}]);
         return user
     },
     async deleteUser(id: string): Promise<boolean> {
-        const result = await UsersCollection.deleteOne({id: id})
+        const result = await UsersModel.deleteOne({id: id})
         return result.deletedCount === 1
     },
     async deleteAllUsers(): Promise<boolean> {
-        const result = await UsersCollection.deleteMany({})
+        const result = await UsersModel.deleteMany({})
         return result.deletedCount === 1
     },
 
@@ -47,21 +48,29 @@ export const usersRepository = {
         return {}
     },
     async updateUserConfirmationCodeByEmail(email: string, confirmationCode: string): Promise<boolean> {
-        const result = await UsersCollection.updateOne({'accountData.email': email}, {$set: {'emailConfirmation.confirmationCode': confirmationCode}})
+        const result = await UsersModel.updateOne({'accountData.email': email}, {$set: {'emailConfirmation.confirmationCode': confirmationCode}})
+        return result.matchedCount === 1
+    },
+    async updateUserRecoveryPasswordCodeByEmail(email: string, recoveryPasswordCode: string): Promise<boolean> {
+        const result = await UsersModel.updateOne({'accountData.email': email}, {$set: {'emailConfirmation.recoveryCode': recoveryPasswordCode}})
         return result.matchedCount === 1
     },
     async updateCheckConfirmCode(code: string): Promise<boolean> {
-        const result = await UsersCollection.updateOne({'emailConfirmation.confirmationCode': code}, {$set: {'emailConfirmation.isConfirmed': true}})
+        const result = await UsersModel.updateOne({'emailConfirmation.confirmationCode': code}, {$set: {'emailConfirmation.isConfirmed': true}})
+        return result.matchedCount === 1
+    },
+    async updatePasswordRecoveryCode(code: string, password: string): Promise<boolean> {
+        const result = await UsersModel.updateOne({'emailConfirmation.recoveryCode': code}, {$set: {'accountData.passwordHash': password}})
         return result.matchedCount === 1
     },
     async findUserByCode(code: string): Promise<UserDbType | null> {
-        return await UsersCollection.findOne({'emailConfirmation.confirmationCode': code}, {projection: {_id: 0}})
+        return UsersModel.findOne({'emailConfirmation.confirmationCode': code}, {projection: {_id: 0}});
     },
     async _findUsersByFilters(filter: Filter<UserDbType>, queryData: UsersPaginationQueryType): Promise<PaginationResultType> {
-        const totalCount = await UsersCollection.countDocuments(filter)
+        const totalCount = await UsersModel.countDocuments({filter})
         const page = Number(queryData.pageNumber)
         const pageSize = Number(queryData.pageSize)
-        const result = await UsersCollection.find(filter, {
+        const result = await UsersModel.find({filter}, {
             projection: {
                 _id: 0,
                 'accountData.passwordHash': 0,
@@ -69,10 +78,10 @@ export const usersRepository = {
                 emailConfirmation: 0,
             },
         })
-            .sort(queryData.sortBy, queryData.sortDirection)
+            .sort([[queryData.sortBy, queryData.sortDirection]])
             .skip((page - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean() as []
         const items = this._mapUserDbToResponse(result)
         return paginationResult(page, pageSize, totalCount, items)
     },
@@ -85,7 +94,5 @@ export const usersRepository = {
         }))
     },
 
-
-    //HYETA
 
 }

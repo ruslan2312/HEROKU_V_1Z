@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export type PostsType = {
     id: string,
     title: string,
@@ -22,3 +24,12 @@ export type FindPostByIdPaginationQueryType = {
     sortBy: string,
     sortDirection: "asc" | "desc";
 }
+export const newPostsScheme = new mongoose.Schema({
+    id: String,
+    title: String,
+    shortDescription: String,
+    content: String,
+    blogId: String,
+    blogName: String,
+    createdAt: String,
+})

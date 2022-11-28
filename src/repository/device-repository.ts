@@ -1,32 +1,32 @@
-import {DevicesCollection} from "./db";
+import {DevicesModel} from "./db";
 import {DeviceResponseType} from "../types/devicesTypes";
 
 export const deviceRepository = {
     async getAllUserDevice(userId: string): Promise<DeviceResponseType[]> {
-        return DevicesCollection.find({userId: userId}, {
+        return DevicesModel.find({userId: userId}, {
             projection: {
                 _id: 0,
                 exp: 0,
                 refreshTokenActive: 0,
                 userId: 0
             }
-        }).toArray()
+        }).lean()
     },
     async addDevice(newDevice: any) {
-        return DevicesCollection.insertOne({...newDevice})
+        return DevicesModel.insertMany([{...newDevice}])
     },
     async checkDeviceByRepeat(userId: string, userAgent: string): Promise<boolean> {
-        const result = await DevicesCollection.findOne({userId: userId, title: userAgent})
+        const result = await DevicesModel.findOne({userId: userId, title: userAgent})
         return !!result;
     },
     async updateRefreshTokenActive(userId: string, userAgent: string, iat: Date, exp: Date, deviceId: string) {
-        return DevicesCollection.updateOne({
+        return DevicesModel.updateOne({
             userId,
             title: userAgent,
         }, {$set: {lastActiveDate: iat.toISOString(), exp: exp.toISOString(), deviceId: deviceId}})
     },
     async updateRefreshToken(userId: string, iat: Date, exp: Date, deviceId: string, searchIat: Date): Promise<boolean> {
-        const result = await DevicesCollection.updateOne({
+        const result = await DevicesModel.updateOne({
             userId: userId,
             lastActiveDate: searchIat.toISOString(),
             deviceId: deviceId
@@ -34,34 +34,34 @@ export const deviceRepository = {
         return result.matchedCount === 1
     },
     async checkRefreshToken(userId: string, iat: Date, exp: Date, deviceId: string): Promise<DeviceResponseType | null> {
-        return await DevicesCollection.findOne({userId, lastActiveDate: iat.toISOString(), deviceId})
+        return DevicesModel.findOne({userId, lastActiveDate: iat.toISOString(), deviceId});
     },
     async deleteDeviceByIdAndUserAgent(userId: string, iat: Date, userAgent: string): Promise<boolean> {
-        const result = await DevicesCollection.deleteOne({
+        const result = await DevicesModel.deleteOne({
             userId: userId,
             lastActiveDate: iat.toISOString(),
         })
         return result.deletedCount === 1
     },
     async deleteDeviceByIdAndIat(userId: string, deviceId: string): Promise<boolean> {
-        const findDevice = await DevicesCollection.find({userId}).toArray()
+        const findDevice = await DevicesModel.find({userId}).lean()
         if (findDevice.length === 1) return true
         console.log(userId, deviceId)
-        const result = await DevicesCollection.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
+        const result = await DevicesModel.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
         if (result) {
             return true
         }
         return false
     },
     async deleteAllDevice() {
-        return await DevicesCollection.deleteMany({});
+        return DevicesModel.deleteMany({});
     },
     async deleteDeviceByDeviceId(userId: string, deviceId: string): Promise<boolean> {
-        const result = await DevicesCollection.deleteOne({userId: userId, deviceId: deviceId})
+        const result = await DevicesModel.deleteOne({userId: userId, deviceId: deviceId})
         return result.deletedCount === 1
     },
     async checkUserForDevice(userId: string): Promise<DeviceResponseType | null> {
-        return DevicesCollection.findOne({userId}, {
+        return DevicesModel.findOne({userId}, {
             projection: {
                 _id: 0,
                 exp: 0,
@@ -71,7 +71,7 @@ export const deviceRepository = {
         })
     },
     async findDeviceById(deviceId: string): Promise<any> {
-        return await DevicesCollection.findOne({deviceId}, {
+        return await DevicesModel.findOne({deviceId}, {
             projection: {
                 _id: 0,
                 exp: 0,

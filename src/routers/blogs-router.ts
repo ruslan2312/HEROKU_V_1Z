@@ -41,7 +41,7 @@ blogsRouter.get('/:blogId/posts',
         }
     })
 blogsRouter.post('/', mwBasicAuth, nameValidation, websiteUrlValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const newBlog: BlogsType = await blogsService.createBlog(req.body.name, req.body.websiteUrl)
+    const newBlog: BlogsType = await blogsService.createBlog(req.body.name, req.body.websiteUrl, req.body.description)
     res.status(201).send(newBlog)
 })
 blogsRouter.post('/:blogId/posts', mwBasicAuth, titleValidation, shortDescriptionValidation, contentValidation,

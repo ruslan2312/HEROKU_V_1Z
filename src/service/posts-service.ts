@@ -21,6 +21,7 @@ export const postsService = {
     },
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<PostsType | null> {
         const blogger = await blogsService.findBlogByID(blogId)
+        console.log(blogger)
         if (!blogger) return null
         if (blogger) {
             const newPost: PostsType = {

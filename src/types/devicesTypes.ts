@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export type  DeviceType = {
     id: string,
     ip: string,
@@ -12,3 +14,12 @@ export type DeviceResponseType = {
     deviceId: string,
     lastActiveDate: string,
 }
+
+export const newDevicesScheme = new mongoose.Schema({
+    id: String,
+    ip: String,
+    title: String,
+    lastActiveDate: String,
+    exp: String,
+    deviceId: String,
+})
