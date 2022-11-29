@@ -66,4 +66,4 @@ export const codeValidator = body('recoveryCode').isString().trim().isLength({
     min: 5,
     max: 150
 })
-export const passwordRecoveryPassword = body('NewPassword').isString().trim().isLength({min: 6, max: 20})
+export const passwordRecoveryPassword = body('newPassword').isString().trim().isLength({min: 6, max: 20})
