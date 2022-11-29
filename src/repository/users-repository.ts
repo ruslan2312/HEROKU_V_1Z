@@ -63,8 +63,11 @@ export const usersRepository = {
         const result = await UsersModel.updateOne({'emailConfirmation.recoveryCode': code}, {$set: {'accountData.passwordHash': password}})
         return result.matchedCount === 1
     },
-    async findUserByCode(code: string): Promise<UserDbType | null> {
+    async findUserByConfirmationCode(code: string): Promise<UserDbType | null> {
         return UsersModel.findOne({'emailConfirmation.confirmationCode': code}, {projection: {_id: 0}});
+    },
+    async findUserByRecoveryCode(code: string): Promise<UserDbType | null> {
+        return UsersModel.findOne({'emailConfirmation.recoveryCode': code}, {projection: {_id: 0}});
     },
     async _findUsersByFilters(filter: Filter<UserDbType>, queryData: UsersPaginationQueryType): Promise<PaginationResultType> {
         const totalCount = await UsersModel.countDocuments({filter})
