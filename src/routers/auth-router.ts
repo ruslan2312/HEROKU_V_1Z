@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {usersService} from "../service/users-service";
 import {jwtService} from "../application/jwt-service";
 import {
-    authLoginValidation, authRegistrationConfirm, codeValidator, passwordRecoveryEmail,
+    authLoginValidation, authRegistrationConfirm, codeValidator, passwordRecoveryEmail, passwordRecoveryPassword,
     usersEmailValidation,
     usersEmailValidationResending,
     usersLoginValidation,
@@ -54,7 +54,7 @@ authRouter.post('/password-recovery', responseCountMiddleware, passwordRecoveryE
         res.sendStatus(204)
     } else return res.sendStatus(400)
 })
-authRouter.post('/new-password', responseCountMiddleware,usersPasswordValidation, codeValidator, inputValidationMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/new-password', responseCountMiddleware,passwordRecoveryPassword, codeValidator, inputValidationMiddleware, async (req: Request, res: Response) => {
     const code = req.body.recoveryCode
     const password = req.body.password
     const registrationConfirm = await authService.passwordRecoveryConfirm(code, password)
