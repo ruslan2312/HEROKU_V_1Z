@@ -37,7 +37,7 @@ export const emailAdapter = {
             },
         });
         console.log(recoveryCode)
-        transporter.sendMail({
+       await transporter.sendMail({
             from: '"RUSEL" <heeca@mail.ru>', // sender address
             to: email, // list of receivers
             subject: subject, // Subject line
