@@ -58,7 +58,7 @@ export const authLogoutValidation = body('logout').custom(async code => {
 
 
 
-export const passwordRecoveryEmail = body('password').isEmail().trim().isLength({
+export const passwordRecoveryEmail = body('email').isEmail().trim().isLength({
     min: 5,
     max: 30
 })
