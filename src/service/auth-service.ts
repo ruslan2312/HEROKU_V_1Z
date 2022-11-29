@@ -6,7 +6,6 @@ import {deviceService} from "./device-service";
 import {deviceRepository} from "../repository/device-repository";
 import bcrypt from "bcrypt";
 
-
 export const authService = {
     async resentEmail(email: string): Promise<boolean | null> {
         const newConfirmationCode = randomUUID()

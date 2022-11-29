@@ -65,11 +65,5 @@ export const passwordRecoveryEmail = body('email').isEmail().trim().isLength({
 export const codeValidator = body('recoveryCode').isString().trim().isLength({
     min: 5,
     max: 150
-}).custom(async code => {
-    const user = await usersRepository.findUserByRecoveryCode(code)
-    if (user === null) throw new Error
-    if (user?.emailConfirmation.confirmationCode !== code) throw new Error
-    if (user?.emailConfirmation.isConfirmed === true) throw new Error
-    return true
 })
 export const passwordRecoveryPassword = body('newPassword').isString().trim().isLength({min: 6, max: 20})
