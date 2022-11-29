@@ -32,6 +32,9 @@ export const authService = {
         } else return false;
     },
     async passwordRecovery(email: string): Promise<boolean> {
+        const user = await usersRepository.findByLoginOrEmail(email)
+        if (user?.emailConfirmation.isConfirmed === true) throw new Error()
+        if (!user) return true
         const NewRecoveryCode = randomUUID()
         await usersRepository.updateUserRecoveryPasswordCodeByEmail(email, NewRecoveryCode);
         await emailAdapter.sendMailRecoveryPassword(email, "RecoveryPassword", NewRecoveryCode)

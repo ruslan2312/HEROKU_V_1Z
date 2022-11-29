@@ -61,11 +61,6 @@ export const authLogoutValidation = body('logout').custom(async code => {
 export const passwordRecoveryEmail = body('email').isEmail().trim().isLength({
     min: 5,
     max: 30
-}).custom(async email => {
-    const user = await usersRepository.findByLoginOrEmail(email)
-    if (user?.emailConfirmation.isConfirmed === true) throw new Error()
-    if (!user) throw new Error()
-    return true
 })
 export const codeValidator = body('recoveryCode').isString().trim().isLength({
     min: 5,
