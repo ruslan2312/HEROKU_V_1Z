@@ -62,7 +62,7 @@ export const passwordRecoveryEmail = body('email').isEmail().trim().isLength({
     min: 5,
     max: 30
 })
-export const codeValidator = body('code').isString().trim().isLength({
+export const codeValidator = body('recoveryCode').isString().trim().isLength({
     min: 5,
     max: 150
 })

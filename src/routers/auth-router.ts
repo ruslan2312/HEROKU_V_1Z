@@ -55,7 +55,7 @@ authRouter.post('/password-recovery', responseCountMiddleware, passwordRecoveryE
     } else return res.sendStatus(400)
 })
 authRouter.post('/new-password', responseCountMiddleware, codeValidator, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const code = req.body.code
+    const code = req.body.recoveryCode
     const password = req.body.password
     const registrationConfirm = await authService.passwordRecoveryConfirm(code, password)
     if (registrationConfirm) {
