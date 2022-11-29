@@ -78,7 +78,6 @@ authRouter.post('/registration-confirmation', responseCountMiddleware, authRegis
     } else res.sendStatus(400)
 })
 
-
 authRouter.post('/refresh-token', checkUsersByRefreshToken, inputValidationMiddleware, async (req: Request, res: Response) => {
     const user = req.user!
     const refreshToken = req.cookies.refreshToken
