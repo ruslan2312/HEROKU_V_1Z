@@ -75,6 +75,9 @@ export const passwordRecoveryPassword = body('newPassword').isString().trim().is
 
 //Likes
 
-export const likeStatusValidator = body('likeStatus').isString().contains("Like"|| "Dislike" || "None"  , { ignoreCase: true})
+export const likeStatusValidator = body('likeStatus').custom(async code => {
+    if(code === "Like" || code === "Dislike" || code === "None") { return true}
+    else throw new Error
+})
 
 //contains("Like" , { ignoreCase: true})
