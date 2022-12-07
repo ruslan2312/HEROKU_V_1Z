@@ -57,7 +57,6 @@ export const authLogoutValidation = body('logout').custom(async code => {
 })
 
 
-
 export const passwordRecoveryEmail = body('email').isEmail().trim().isLength({
     min: 5,
     max: 30
@@ -72,3 +71,10 @@ export const codeValidator = body('recoveryCode').isString().trim().isLength({
     return true
 })
 export const passwordRecoveryPassword = body('newPassword').isString().trim().isLength({min: 6, max: 20})
+
+
+//Likes
+
+export const likeStatusValidator = body('likeStatus').isString().contains("Like"|| "Dislike" || "None"  , { ignoreCase: true})
+
+//contains("Like" , { ignoreCase: true})

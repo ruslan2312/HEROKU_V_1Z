@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {commentsService} from "../service/comments-service";
 import {authTokenMW} from "../middleware/authorization-middleware";
 import {CommentsResponseType} from "../types/commentsType";
-import {commentsContentValidation} from "../common/validator";
+import {commentsContentValidation, likeStatusValidator} from "../common/validator";
 import {inputValidationMiddleware} from "../middleware/Input-validation-middleware";
 import {CommentsPaginationData} from "../common/blogPaginationData";
 import {postsService} from "../service/posts-service";
@@ -51,7 +51,7 @@ commentsRouter.delete('/:commentId', authTokenMW, async (req: Request, res: Resp
     await commentsService.deleteComment(commentId)
     return res.sendStatus(204)
 })
-commentsRouter.put('/:commentId/like-status', authTokenMW, inputValidationMiddleware, async (req: Request, res: Response) => {
+commentsRouter.put('/:commentId/like-status', authTokenMW, likeStatusValidator, inputValidationMiddleware, async (req: Request, res: Response) => {
     const commentId = req.params.commentId
     const userId = req!.user!.id
     const likeStatus = req.body.likeStatus
@@ -59,7 +59,7 @@ commentsRouter.put('/:commentId/like-status', authTokenMW, inputValidationMiddle
     if (!comment) return res.sendStatus(404)
     if (comment.userId !== userId) return res.sendStatus(403)
     const like = await commentsService.createLikeByComment(commentId, userId, likeStatus)
-    return res.send(like).status(204)
+    return res.sendStatus(204)
 })
 
 postsRouter.get('/:postId/comments', GetAuthTokenMW, async (req: Request, res: Response) => {
