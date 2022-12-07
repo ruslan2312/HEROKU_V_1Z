@@ -57,7 +57,6 @@ commentsRouter.put('/:commentId/like-status', authTokenMW, likeStatusValidator, 
     const likeStatus = req.body.likeStatus
     const comment = await commentsService.findCommentsByID(commentId, userId)
     if (!comment) return res.sendStatus(404)
-    if (comment.userId !== userId) return res.sendStatus(403)
     const like = await commentsService.createLikeByComment(commentId, userId, likeStatus)
     return res.sendStatus(204)
 })
