@@ -16,7 +16,6 @@ export const usersRepository = {
         return UsersModel.findOne({id: id}, {projection: {_id: 0}});
     },
     async createUser(user: UserDbType): Promise<UserDbType> {
-        console.log(user)
         await UsersModel.insertMany([{...user}]);
         return user
     },

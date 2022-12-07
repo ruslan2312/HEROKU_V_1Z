@@ -70,6 +70,7 @@ export const usersService = {
         } else return null;
     },
     async getUserIdByAccessToken(token: string) {
+
         try {
             const result: any = jwt.verify(token, settings.JWT_SECRET)
             return result.id

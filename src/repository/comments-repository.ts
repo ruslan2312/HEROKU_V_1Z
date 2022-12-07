@@ -1,13 +1,100 @@
-import {CommentsPaginationQueryType, CommentsType} from "../types/commentsType";
-import {CommentsModel} from "./db";
+import {CommentsPaginationQueryType, CommentsResponseType, CommentsType} from "../types/commentsType";
+import {CommentsModel, LikesModel} from "./db";
 import {Filter} from "mongodb";
 import {PaginationResultType} from "../helpers/paginathion";
 
-export const comments: CommentsType[] = []
-
 export const commentsRepository = {
-    async findCommentsByID(id: string): Promise<CommentsType | null> {
-        return CommentsModel.findOne({id: id}, {projection: {_id: 0}});
+    async findCommentsByID(id: string, userId: number | string): Promise<CommentsResponseType | null> {
+        const items = await CommentsModel
+            .aggregate([
+                {$match: {id: id}},
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: 'id',
+                        foreignField: 'parentId',
+                        pipeline: [
+                            {
+                                $match: {
+                                    status: 'Like',
+                                },
+                            },
+                            {$count: 'count'},
+                        ],
+                        as: 'likesCount',
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: 'id',
+                        foreignField: 'parentId',
+                        pipeline: [
+                            {
+                                $match: {
+                                    status: 'Dislike',
+                                },
+                            },
+                            {
+                                $count: 'count',
+                            },
+                        ],
+                        as: 'dislikesCount',
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: 'id',
+                        foreignField: 'parentId',
+                        pipeline: [
+                            {
+                                $match: {userId: userId},
+                            },
+                            {
+                                $project: {_id: 0, status: 1},
+                            },
+                        ],
+                        as: 'myStatus',
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        id: 1,
+                        content: 1,
+                        userId: 1,
+                        userLogin: 1,
+                        createdAt: 1,
+                        'likesInfo.likesCount': {
+                            $cond: {
+                                if: {$eq: [{$size: "$likesCount"}, 0]},
+                                then: 0,
+                                else: "$likesCount.count"
+                            }
+                        },
+                        'likesInfo.dislikesCount': {
+                            $cond: {
+                                if: {$eq: [{$size: "$dislikesCount"}, 0]},
+                                then: 0,
+                                else: "$dislikesCount.count"
+                            }
+                        },
+                        'likesInfo.myStatus': {
+                            $cond: {
+                                if: {$eq: [{$size: "$myStatus"}, 0]},
+                                then: "None",
+                                else: "$myStatus.status"
+                            }
+                        },
+                    },
+                },
+                {$unwind: "$likesInfo.likesCount"},
+                {$unwind: "$likesInfo.dislikesCount"},
+                {$unwind: "$likesInfo.myStatus"}
+            ])
+        console.log(items[0])
+        return items[0]
     },
     async updateComments(commentId: string, content: string, userId: string): Promise<boolean | null> {
         try {
@@ -28,17 +115,104 @@ export const commentsRepository = {
     async deleteAllComments() {
         return CommentsModel.deleteMany({})
     },
-    async findCommentsByPostId(queryData: CommentsPaginationQueryType, postId: string): Promise<PaginationResultType | null> {
+    async findCommentsByPostId(queryData: CommentsPaginationQueryType, postId: string, userId: string | number): Promise<PaginationResultType | null> {
         const filter: Filter<CommentsType> = {parentId: postId}
+        const objectSort = {[queryData.sortBy]: queryData.sortDirection}
         const totalCount = await CommentsModel.countDocuments({filter});
         const pagesCount = Number(Math.ceil(Number(totalCount) / queryData.pageSize))
         const page = Number(queryData.pageNumber)
         const pageSize = Number(queryData.pageSize)
-        const items = await CommentsModel.find({filter},
-            {projection: {_id: 0, parentId: 0}}).sort([[queryData.sortBy, queryData.sortDirection]])
+        const items = await CommentsModel
+            .aggregate([
+                {$match: {parentId: postId}},
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: 'id',
+                        foreignField: 'parentId',
+                        pipeline: [
+                            {
+                                $match: {
+                                    status: 'Like',
+                                },
+                            },
+                            {$count: 'count'},
+                        ],
+                        as: 'likesCount',
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: 'id',
+                        foreignField: 'parentId',
+                        pipeline: [
+                            {
+                                $match: {
+                                    status: 'Dislike',
+                                },
+                            },
+                            {
+                                $count: 'count',
+                            },
+                        ],
+                        as: 'dislikesCount',
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: 'id',
+                        foreignField: 'parentId',
+                        pipeline: [
+                            {
+                                $match: {userId: userId},
+                            },
+                            {
+                                $project: {_id: 0, status: 1},
+                            },
+                        ],
+                        as: 'myStatus',
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        id: 1,
+                        content: 1,
+                        userId: 1,
+                        userLogin: 1,
+                        createdAt: 1,
+                        'likesInfo.likesCount': {
+                            $cond: {
+                                if: {$eq: [{$size: "$likesCount"}, 0]},
+                                then: 0,
+                                else: "$likesCount.count"
+                            }
+                        },
+                        'likesInfo.dislikesCount': {
+                            $cond: {
+                                if: {$eq: [{$size: "$dislikesCount"}, 0]},
+                                then: 0,
+                                else: "$dislikesCount.count"
+                            }
+                        },
+                        'likesInfo.myStatus': {
+                            $cond: {
+                                if: {$eq: [{$size: "$myStatus"}, 0]},
+                                then: "None",
+                                else: "$myStatus.status"
+                            }
+                        },
+                    },
+                },
+                {$unwind: "$likesInfo.likesCount"},
+                {$unwind: "$likesInfo.dislikesCount"},
+                {$unwind: "$likesInfo.myStatus"}
+            ])
+            .sort(objectSort)
             .skip((page - 1) * pageSize)
             .limit(pageSize)
-            .lean() as []
         return ({pagesCount, page, pageSize, totalCount, items,})
     }
     ,
@@ -51,4 +225,89 @@ export const commentsRepository = {
             return null
         }
     },
+    async createLikeByComment(commentId: string, userId: string, likeStatus: string) {
+        return LikesModel.updateOne({parentId: commentId, userId: userId}, {status: likeStatus}, {upsert: true});
+    }
 }
+
+
+// const comments = await this.commentModel
+//       .aggregate([
+//         { $match: { postId: postId, isBanned: false } },
+//         {
+//           $lookup: {
+//             from: 'likes',
+//             localField: '_id',
+//             foreignField: 'commentId',
+//             pipeline: [
+//               {
+//                 $match: {
+//                   status: 'Like',
+//                   isBanned: false,
+//                 },
+//               },
+//               { $count: 'count' },
+//             ],
+//             as: 'likesCount',
+//           },
+//         },
+//         {
+//           $lookup: {
+//             from: 'likes',
+//             localField: '_id',
+//             foreignField: 'commentId',
+//             pipeline: [
+//               {
+//                 $match: {
+//                   status: 'Dislike',
+//                   isBanned: false,
+//                 },
+//               },
+//               {
+//                 $count: 'count',
+//               },
+//             ],
+//             as: 'dislikesCount',
+//           },
+//         },
+//         {
+//           $lookup: {
+//             from: 'likes',
+//             localField: '_id',
+//             foreignField: 'commentId',
+//             pipeline: [
+//               {
+//                 $match: { userId: new mongoose.Types.ObjectId(userId) },
+//               },
+//               {
+//                 $project: { _id: 0, status: 1 },
+//               },
+//             ],
+//             as: 'myStatus',
+//           },
+//         },
+//         {
+//           $project: {
+//             _id: 0,
+//             id: '$_id',
+//             content: 1,
+//             userId: 1,
+//             userLogin: 1,
+//             createdAt: 1,
+//             'likesInfo.likesCount': '$likesCount',
+//             'likesInfo.dislikesCount': '$dislikesCount',
+//             'likesInfo.myStatus': '$myStatus',
+//           },
+//         },
+//       ])
+//
+//
+// likes {
+// type: mongoose.Schema.likeScheme
+// ref: "likeList"
+// default: {} }
+//
+//
+// likeList: { type:Array,
+// default: [], }
+// }

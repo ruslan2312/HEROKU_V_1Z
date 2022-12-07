@@ -5,6 +5,11 @@ export type CommentsResponseType = {
     content: string,
     userId: string,
     userLogin: string,
+    likesInfo: {
+        likesCount: number,
+        dislikesCount: number,
+        myStatus: string
+    }
     createdAt: string
 }
 export type CommentsType = {
@@ -13,8 +18,20 @@ export type CommentsType = {
     content: string,
     userId: string,
     userLogin: string,
+    likesInfo: {
+        "likesCount": number,
+        "dislikesCount": number,
+        "myStatus": string
+    },
     createdAt: string
 }
+
+export type LikesType = {
+    userId: string,
+    parentId: string,
+    status: 'None' | 'Like' | 'Dislike'
+}
+
 export type  CommentsPaginationQueryType = {
     content?: string
     postId: string,
@@ -30,5 +47,16 @@ export const newCommentsScheme = new mongoose.Schema({
     content: String,
     userId: String,
     userLogin: String,
-    createdAt: String
+    createdAt: String,
+    likesInfo: {
+        likesCount: { type: Number, required: true},
+        dislikesCount: { type: Number, required: true},
+        myStatus: { type: String, required: true},
+    }
+})
+
+export const likesSchema = new mongoose.Schema({
+    userId: String,
+    status: String,
+    parentId: String
 })

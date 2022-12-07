@@ -2,17 +2,15 @@ import {Request, Response, Router} from "express";
 import {inputValidationMiddleware} from "../middleware/Input-validation-middleware";
 import {mwBasicAuth} from "../middleware/MwBasic";
 import {postsService} from "../service/posts-service";
-import {CommentsPaginationData, getPostPaginationData} from "../common/blogPaginationData";
+import { getPostPaginationData} from "../common/blogPaginationData";
 import {
     titleValidation,
     shortDescriptionValidation,
     contentValidation,
     blogIdValidation,
-    blogNameValidation, commentsContentValidation
+    blogNameValidation
 } from "../common/validator";
-import {authTokenMW} from "../middleware/authorization-middleware";
-import {commentsService} from "../service/comments-service";
-import {PaginationResultType} from "../helpers/paginathion";
+
 
 export const postsRouter = Router()
 postsRouter.get('/', async (req: Request, res: Response) => {
@@ -54,29 +52,7 @@ postsRouter.post('/', mwBasicAuth, titleValidation, shortDescriptionValidation, 
     })
 
 /// COMMENTS ==========================================================================================================
-postsRouter.get('/:postId/comments', async (req: Request, res: Response) => {
-    const postId = req.params.postId
-    const queryData = CommentsPaginationData(req.query)
-    const post = await postsService.findPostByID(postId)
-    if (!post) return  res.sendStatus(404)
-    const findCommentsByPostId: PaginationResultType | null = await commentsService.findCommentsByPostId(queryData, req.params.postId)
-    res.status(200).send(findCommentsByPostId)
-})
-postsRouter.post('/:postId/comments', authTokenMW, commentsContentValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
-    try {
-        const content = req.body.content
-        const postId = req.params.postId
-        const user = req.user
-        const post = postsService.findPostByID(postId)
-        if (!post) return  res.sendStatus(404)
-        const newComment = await commentsService.createCommentsByPostId(content, postId, user)
-        if (newComment) {
-            res.status(201).send(newComment);
-        } else res.sendStatus(404)
 
-    } catch (error) {
-    }
-})
 
 
 

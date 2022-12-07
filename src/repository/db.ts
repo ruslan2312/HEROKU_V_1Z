@@ -1,4 +1,4 @@
-import {CommentsType, newCommentsScheme} from "../types/commentsType";
+import { likesSchema, newCommentsScheme} from "../types/commentsType";
 import {newUsersScheme} from "../types/usersType"
 import {newPostsScheme} from "../types/postsType"
 import {newBloggersScheme} from "../types/blogsType"
@@ -11,7 +11,9 @@ import {newReqScheme} from "../types/type";
 const mongoUri = settings.MONGO_URI
 
 
-export const CommentsModel = mongoose.model<CommentsType>('comments', newCommentsScheme)
+export const CommentsModel = mongoose.model('comments', newCommentsScheme)
+export const LikesModel = mongoose.model('likes', likesSchema)
+
 export const BlogsModel = mongoose.model('blogs', newBloggersScheme)
 export const PostsModel = mongoose.model('posts', newPostsScheme)
 

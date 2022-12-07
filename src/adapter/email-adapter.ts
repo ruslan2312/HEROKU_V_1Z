@@ -15,7 +15,7 @@ export const emailAdapter = {
                 pass: mailAccount.pass, // generated ethereal password
             },
         });
-        transporter.sendMail({
+       await transporter.sendMail({
             from: '"RUSEL" <heeca@mail.ru>', // sender address
             to: email, // list of receivers
             subject: subject, // Subject line
@@ -36,7 +36,6 @@ export const emailAdapter = {
                 pass: mailAccount.pass, // generated ethereal password
             },
         });
-        console.log(recoveryCode)
        await transporter.sendMail({
             from: '"RUSEL" <heeca@mail.ru>', // sender address
             to: email, // list of receivers

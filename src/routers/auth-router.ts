@@ -49,7 +49,6 @@ authRouter.post('/registration', responseCountMiddleware, usersLoginValidation, 
 authRouter.post('/password-recovery', responseCountMiddleware, passwordRecoveryEmail, inputValidationMiddleware, async (req: Request, res: Response) => {
     const email = req.body.email
     const passwordRecovery = await authService.passwordRecovery(email)
-    console.log(passwordRecovery)
     if (passwordRecovery) {
         res.sendStatus(204)
     } else return res.sendStatus(400)
@@ -65,7 +64,6 @@ authRouter.post('/new-password', responseCountMiddleware,passwordRecoveryPasswor
 authRouter.post('/registration-email-resending', responseCountMiddleware, usersEmailValidationResending, inputValidationMiddleware, async (req: Request, res: Response) => {
     const email = req.body.email
     const resendingEmail = await authService.resentEmail(email)
-    console.log(resendingEmail)
     if (resendingEmail) {
         res.sendStatus(204)
     } else return res.sendStatus(400)

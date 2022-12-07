@@ -1,4 +1,4 @@
-import { UserResponseType} from "../types/usersType";
+import {UserResponseType} from "../types/usersType";
 import {PostsType} from "../types/postsType"
 import {BlogsType} from "../types/blogsType"
 import {CommentsResponseType} from "../types/commentsType"
