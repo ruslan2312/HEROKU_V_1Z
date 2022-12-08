@@ -118,7 +118,7 @@ export const commentsRepository = {
     async findCommentsByPostId(queryData: CommentsPaginationQueryType, postId: string, userId: string | number): Promise<PaginationResultType | null> {
         const filter: Filter<CommentsType> = {parentId: postId}
         const objectSort = {[queryData.sortBy]: queryData.sortDirection}
-        const totalCount = await CommentsModel.countDocuments({filter});
+        const totalCount = await CommentsModel.countDocuments({parentId: postId});
         const pagesCount = Number(Math.ceil(Number(totalCount) / queryData.pageSize))
         const page = Number(queryData.pageNumber)
         const pageSize = Number(queryData.pageSize)
