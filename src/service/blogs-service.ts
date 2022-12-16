@@ -11,8 +11,8 @@ export const blogsService = {
     async findBlogByID(id: string): Promise<BlogsType | null> {
         return blogsRepository.findBlogByID(id)
     },
-    async findBlogAndPostByID(query: FindPostByIdPaginationQueryType, blogId: string): Promise<PostsType[] | any> {
-        return await blogsRepository.findBlogByPostId(query, blogId)
+    async findBlogAndPostByID(query: FindPostByIdPaginationQueryType, blogId: string, userId: string): Promise<PostsType[] | any> {
+        return await blogsRepository.findBlogByPostId(query, blogId, userId)
     },
     async createBlog(name: string, websiteUrl: string, description: string): Promise<BlogsType> {
         const newBlog = {

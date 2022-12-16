@@ -13,6 +13,7 @@ import {
     nameValidation,
     websiteUrlValidation
 } from "../common/validator";
+import {GetAuthTokenMW} from "../middleware/Getauthorization-middleware";
 
 export const blogsRouter = Router()
 
@@ -30,15 +31,28 @@ blogsRouter.get('/:id',
             res.sendStatus(404)
         }
     })
-blogsRouter.get('/:blogId/posts',
+
+blogsRouter.get('/:blogId/posts', GetAuthTokenMW,
     async (req: Request, res: Response) => {
-        const queryData = findPostByIdTypePaginationData(req.query)
-        const post: PostsType[] = await blogsService.findBlogAndPostByID(queryData, req.params.blogId)
-        if (post) {
-            res.status(200).send(post)
-        } else {
-            res.sendStatus(404)
+        try {
+            const userId = req.user.id
+            const queryData = findPostByIdTypePaginationData(req.query)
+            const post: PostsType[] = await blogsService.findBlogAndPostByID(queryData, req.params.blogId, userId)
+            if (post) {
+                res.status(200).send(post)
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (e) {
+            const queryData = findPostByIdTypePaginationData(req.query)
+            const post: PostsType[] = await blogsService.findBlogAndPostByID(queryData, req.params.blogId, '')
+            if (post) {
+                res.status(200).send(post)
+            } else {
+                res.sendStatus(404)
+            }
         }
+
     })
 blogsRouter.post('/', mwBasicAuth, nameValidation, websiteUrlValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     const newBlog: BlogsType = await blogsService.createBlog(req.body.name, req.body.websiteUrl, req.body.description)
