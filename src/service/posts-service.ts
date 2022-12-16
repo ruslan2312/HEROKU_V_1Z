@@ -12,14 +12,15 @@ import {postsRouter} from "../routers/posts-router";
 
 export const postsService = {
     async findPosts(query: PostPaginationQueryType, userId: string | null): Promise<PaginationResultType> {
-        return  postsRepository.findPosts(query, userId)
+        return postsRepository.findPosts(query, userId)
     },
     async findPostByID(postId: string, userId: string | null): Promise<PostsType | null> {
         const post = await postsRepository.findPostByID(postId)
         if (!post) return null
         const like = await LikesModel.findOne({userId: userId, parentId: postId})
         const newestLikes: NewestLikesType[] = await LikesModel
-            .find({ parentId: postId, status: 'Like'}, {_id: 0, userId: 1, login: 1, addedAt: '$createdAt'})
+            .find({parentId: postId, status: 'Like'}, {_id: 0, userId: 1, login: 1, addedAt: '$createdAt'})
+            .sort({'createdAt': -1})
             .limit(3)
             .lean()
 
@@ -27,7 +28,7 @@ export const postsService = {
             post.extendedLikesInfo.myStatus = like.status!
         }
 
-       post.extendedLikesInfo.newestLikes = newestLikes
+        post.extendedLikesInfo.newestLikes = newestLikes
 
 // В лайке создать логин
         return post
