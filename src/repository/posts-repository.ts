@@ -63,8 +63,8 @@ export const postsRepository = {
                     "blogId": 1,
                     "blogName": 1,
                     "createdAt": 1,
-                    "extendedLikesInfo.likesCount": "$likesCount",
-                    "extendedLikesInfo.dislikesCount": "$dislikesCount",
+                    "extendedLikesInfo.likesCount": 1,
+                    "extendedLikesInfo.dislikesCount": 1,
                     "extendedLikesInfo.myStatus": {
                         $cond: {
                             if: {$eq: [{$size: "$myStatus"}, 0]},

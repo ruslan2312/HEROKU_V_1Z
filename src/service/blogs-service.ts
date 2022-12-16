@@ -38,7 +38,7 @@ export const blogsService = {
                 extendedLikesInfo: {
                     likesCount: 0,
                     dislikesCount: 0,
-                    myStatus: '',
+                    myStatus: "None",
                     newestLikes: []
                 }
             }
