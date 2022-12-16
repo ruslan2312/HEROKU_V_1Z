@@ -30,6 +30,7 @@ export const blogsRepository = {
         return BlogsModel.findOne({id: id}, {_id: 0, __v: 0});
     },
     async findBlogByPostId(queryData: FindPostByIdPaginationQueryType, blogId: string, userId: string): Promise<PaginationResultType | null> {
+        console.log(blogId)
         const objectSort = {[queryData.sortBy]: queryData.sortDirection}
         const totalCount = await PostsModel.countDocuments({});
         const page = Number(queryData.pageNumber)
@@ -95,10 +96,13 @@ export const blogsRepository = {
                     },
                     "extendedLikesInfo.newestLikes": "$newestLikes"
                 }
-            }, {$unwind: "$extendedLikesInfo.myStatus"}])
+            },
+            {$unwind: "$extendedLikesInfo.myStatus"}
+        ])
             .sort(objectSort)
             .skip((page - 1) * pageSize)
             .limit(pageSize)
+        console.log(posts)
         return paginationResult(page, pageSize, totalCount, posts)
     },
     async createBlog(newBlog: BlogsType): Promise<BlogsType> {
