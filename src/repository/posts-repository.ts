@@ -38,7 +38,7 @@ export const postsRepository = {
                         },
                     }, {
                         $sort: {
-                            "createdAt": 1
+                            "createdAt": -1
                         },
                     }, {
                         $limit: 3
