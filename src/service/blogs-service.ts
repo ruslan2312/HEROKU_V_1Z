@@ -9,7 +9,7 @@ export const blogsService = {
         return blogsRepository.findBlog(query)
     },
     async findBlogByID(id: string): Promise<BlogsType | null> {
-        return  blogsRepository.findBlogByID(id)
+        return blogsRepository.findBlogByID(id)
     },
     async findBlogAndPostByID(query: FindPostByIdPaginationQueryType, blogId: string): Promise<PostsType[] | any> {
         return await blogsRepository.findBlogByPostId(query, blogId)
@@ -34,7 +34,13 @@ export const blogsService = {
                 content: content,
                 blogId: blogId,
                 blogName: blogger.name,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                extendedLikesInfo: {
+                    likesCount: 0,
+                    dislikesCount: 0,
+                    myStatus: '',
+                    newestLikes: []
+                }
             }
             return await postsRepository.createPost(newPost)
         }

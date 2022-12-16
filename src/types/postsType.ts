@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+export type NewestLikesType = {
+    addedAt: string,
+    userId: string,
+    login: string
+}
+
 export type PostsType = {
     id: string,
     title: string,
@@ -8,6 +14,12 @@ export type PostsType = {
     blogId: string,
     blogName: string,
     createdAt: string;
+    extendedLikesInfo: {
+        likesCount: number,
+        dislikesCount: number,
+        myStatus: string,
+        newestLikes: NewestLikesType[]
+    }
 }
 export type PostPaginationQueryType = {
     searchNameTerm: string,
@@ -24,12 +36,25 @@ export type FindPostByIdPaginationQueryType = {
     sortBy: string,
     sortDirection: "asc" | "desc";
 }
-export const newPostsScheme = new mongoose.Schema({
-    id: String,
-    title: String,
-    shortDescription: String,
-    content: String,
-    blogId: String,
-    blogName: String,
-    createdAt: String,
+
+const newestLikesSchema = new mongoose.Schema<NewestLikesType>({
+    addedAt: {type: String},
+    userId: {type: String},
+    login: {type: String}
+})
+
+export const newPostsScheme = new mongoose.Schema<PostsType>({
+    id: {type: String},
+    title: {type: String},
+    shortDescription: {type: String},
+    content: {type: String},
+    blogId: {type: String},
+    blogName: {type: String},
+    createdAt: {type: String},
+    extendedLikesInfo: {
+        likesCount: {type: Number},
+        dislikesCount: {type: Number},
+        myStatus: {type: String},
+        newestLikes: {type: [newestLikesSchema]}
+    }
 })

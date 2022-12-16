@@ -227,87 +227,9 @@ export const commentsRepository = {
     },
     async createLikeByComment(commentId: string, userId: string, likeStatus: string) {
         return LikesModel.updateOne({parentId: commentId, userId: userId}, {status: likeStatus}, {upsert: true});
+    },
+    async deleteAllLike() {
+        return LikesModel.deleteMany({})
     }
 }
 
-
-// const comments = await this.commentModel
-//       .aggregate([
-//         { $match: { postId: postId, isBanned: false } },
-//         {
-//           $lookup: {
-//             from: 'likes',
-//             localField: '_id',
-//             foreignField: 'commentId',
-//             pipeline: [
-//               {
-//                 $match: {
-//                   status: 'Like',
-//                   isBanned: false,
-//                 },
-//               },
-//               { $count: 'count' },
-//             ],
-//             as: 'likesCount',
-//           },
-//         },
-//         {
-//           $lookup: {
-//             from: 'likes',
-//             localField: '_id',
-//             foreignField: 'commentId',
-//             pipeline: [
-//               {
-//                 $match: {
-//                   status: 'Dislike',
-//                   isBanned: false,
-//                 },
-//               },
-//               {
-//                 $count: 'count',
-//               },
-//             ],
-//             as: 'dislikesCount',
-//           },
-//         },
-//         {
-//           $lookup: {
-//             from: 'likes',
-//             localField: '_id',
-//             foreignField: 'commentId',
-//             pipeline: [
-//               {
-//                 $match: { userId: new mongoose.Types.ObjectId(userId) },
-//               },
-//               {
-//                 $project: { _id: 0, status: 1 },
-//               },
-//             ],
-//             as: 'myStatus',
-//           },
-//         },
-//         {
-//           $project: {
-//             _id: 0,
-//             id: '$_id',
-//             content: 1,
-//             userId: 1,
-//             userLogin: 1,
-//             createdAt: 1,
-//             'likesInfo.likesCount': '$likesCount',
-//             'likesInfo.dislikesCount': '$dislikesCount',
-//             'likesInfo.myStatus': '$myStatus',
-//           },
-//         },
-//       ])
-//
-//
-// likes {
-// type: mongoose.Schema.likeScheme
-// ref: "likeList"
-// default: {} }
-//
-//
-// likeList: { type:Array,
-// default: [], }
-// }

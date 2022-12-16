@@ -57,6 +57,9 @@ export const newCommentsScheme = new mongoose.Schema({
 
 export const likesSchema = new mongoose.Schema({
     userId: String,
+    login: String,
+    createdAt:String,
+    addedAt: String,
     status: String,
-    parentId: String
+    parentId: String,
 })

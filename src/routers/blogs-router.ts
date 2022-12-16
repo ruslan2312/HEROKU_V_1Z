@@ -23,9 +23,9 @@ blogsRouter.get('/', async (req: Request, res: Response) => {
 })
 blogsRouter.get('/:id',
     async (req: Request, res: Response) => {
-        let post: BlogsType | null = await blogsService.findBlogByID(req.params.id)
-        if (post) {
-            res.status(200).send(post)
+        let blog: BlogsType | null = await blogsService.findBlogByID(req.params.id)
+        if (blog) {
+            res.status(200).send(blog)
         } else {
             res.sendStatus(404)
         }

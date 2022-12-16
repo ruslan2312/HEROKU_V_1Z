@@ -66,19 +66,18 @@ postsRouter.get('/:postId/comments', GetAuthTokenMW, async (req: Request, res: R
         const userId = req.user.id
         const postId = req.params.postId
         const queryData = CommentsPaginationData(req.query)
-        const post = await postsService.findPostByID(postId)
+        const post = await postsService.findPostByID(postId, '')
         if (!post) return res.sendStatus(404)
         const findCommentsByPostId: PaginationResultType | null = await commentsService.findCommentsByPostId(queryData, req.params.postId, userId)
         res.status(200).send(findCommentsByPostId)
     } catch (e) {
         const postId = req.params.postId
         const queryData = CommentsPaginationData(req.query)
-        const post = await postsService.findPostByID(postId)
+        const post = await postsService.findPostByID(postId, '')
         if (!post) return res.sendStatus(404)
         const findCommentsByPostId: PaginationResultType | null = await commentsService.findCommentsByPostId(queryData, req.params.postId, 0)
         res.status(200).send(findCommentsByPostId)
     }
-
 
 
 })
@@ -89,7 +88,7 @@ postsRouter.post('/:postId/comments', authTokenMW, commentsContentValidation, in
         const content = req.body.content
         const postId = req.params.postId
         const user = req.user
-        const post = postsService.findPostByID(postId)
+        const post = postsService.findPostByID(postId, '')
         if (!post) return res.sendStatus(404)
         const newComment = await commentsService.createCommentsByPostId(content, postId, user)
         if (newComment) {

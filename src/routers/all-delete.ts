@@ -5,6 +5,7 @@ import {usersService} from "../service/users-service";
 import {commentsService} from "../service/comments-service";
 import {deviceService} from "../service/device-service";
 import {requestDbRepo} from "../repository/requestDbRepo";
+import {commentsRepository} from "../repository/comments-repository";
 
 export const allDelete = Router();
 
@@ -15,5 +16,6 @@ allDelete.delete('/', async (req: Request, res: Response) => {
     await commentsService.deleteAllComments()
     await deviceService.deleteAllDevice()
     await requestDbRepo.deleteAllRequest()
+    await commentsRepository.deleteAllLike()
     res.sendStatus(204)
 })
